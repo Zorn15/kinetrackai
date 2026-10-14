@@ -1,0 +1,356 @@
+{
+  "modelo": "XGBoost",
+  "hiperparametros": {
+    "subsample": 1.0,
+    "n_estimators": 800,
+    "min_child_weight": 10,
+    "max_depth": 4,
+    "learning_rate": 0.03,
+    "colsample_bytree": 0.8
+  },
+  "variables_categoricas": [
+    "posicion",
+    "pie_habil",
+    "tipo_lesion",
+    "zona_cuerpo"
+  ],
+  "variables_numericas": [
+    "edad",
+    "altura_cm",
+    "mes_lesion",
+    "lesiones_previas",
+    "dias_baja_previos",
+    "dias_baja_ultimo_anio",
+    "lesiones_previas_mismo_tipo",
+    "partidos_temporada_anterior"
+  ],
+  "opciones": {
+    "posicion": [
+      "Defensa central",
+      "Delantero centro",
+      "Extremo derecho",
+      "Extremo izquierdo",
+      "Lateral derecho",
+      "Lateral izquierdo",
+      "Mediapunta",
+      "Mediocentro",
+      "Mediocentro defensivo",
+      "Portero",
+      "Segundo delantero",
+      "Volante derecho",
+      "Volante izquierdo"
+    ],
+    "pie_habil": [
+      "Ambos",
+      "Derecho",
+      "Izquierdo"
+    ],
+    "tipo_lesion": [
+      "Cirugía (otra zona)",
+      "Cirugía de rodilla",
+      "Desgarro muscular",
+      "Esguince de tobillo",
+      "Fatiga muscular",
+      "Fractura (otra zona)",
+      "Fractura de pie",
+      "Golpe / contusión",
+      "Inflamación / tendinitis",
+      "Lesión de aductores / ingle",
+      "Lesión de brazo / mano",
+      "Lesión de cabeza / cuello",
+      "Lesión de cadera",
+      "Lesión de espalda",
+      "Lesión de hombro",
+      "Lesión de isquiotibiales",
+      "Lesión de ligamento cruzado",
+      "Lesión de ligamentos (otra zona)",
+      "Lesión de menisco",
+      "Lesión de muslo",
+      "Lesión de pantorrilla (gemelo)",
+      "Lesión de pie",
+      "Lesión de pierna",
+      "Lesión de rodilla",
+      "Lesión de tobillo",
+      "Lesión de tronco (costillas / abdomen)",
+      "Lesión del tendón de Aquiles",
+      "Lesión muscular (sin zona)",
+      "Otra lesión"
+    ],
+    "zona_cuerpo": [
+      "Brazo / mano",
+      "Cabeza / cuello",
+      "Cadera",
+      "Espalda",
+      "Hombro",
+      "Ingle / aductores",
+      "Muslo",
+      "No especificada",
+      "Pie",
+      "Pierna / pantorrilla",
+      "Rodilla",
+      "Tobillo",
+      "Tronco"
+    ]
+  },
+  "rangos_numericos": {
+    "edad": [
+      16.0,
+      43.0
+    ],
+    "altura_cm": [
+      163.0,
+      206.0
+    ],
+    "mes_lesion": [
+      1.0,
+      12.0
+    ],
+    "lesiones_previas": [
+      0.0,
+      14.0
+    ],
+    "dias_baja_previos": [
+      0.0,
+      1556.0
+    ],
+    "dias_baja_ultimo_anio": [
+      0.0,
+      540.0
+    ],
+    "lesiones_previas_mismo_tipo": [
+      0.0,
+      10.0
+    ],
+    "partidos_temporada_anterior": [
+      0.0,
+      59.0
+    ]
+  },
+  "valores_tipicos": {
+    "posicion": "Defensa central",
+    "pie_habil": "Derecho",
+    "tipo_lesion": "Lesión muscular (sin zona)",
+    "zona_cuerpo": "No especificada",
+    "edad": 26.0,
+    "altura_cm": 183.0,
+    "mes_lesion": 2.0,
+    "lesiones_previas": 4.0,
+    "dias_baja_previos": 119.0,
+    "dias_baja_ultimo_anio": 16.0,
+    "lesiones_previas_mismo_tipo": 0.0,
+    "partidos_temporada_anterior": 31.0
+  },
+  "metricas_validacion_por_jugador": {
+    "MAE": 22.578,
+    "RMSE": 40.224,
+    "MedAE": 11.886,
+    "R2": 0.369
+  },
+  "factor_rango": [
+    0.568,
+    1.676
+  ],
+  "importancia_global": {
+    "tipo_lesion": 0.7200999855995178,
+    "zona_cuerpo": 0.18410000205039978,
+    "posicion": 0.04349999874830246,
+    "mes_lesion": 0.010700000450015068,
+    "pie_habil": 0.010700000450015068,
+    "dias_baja_ultimo_anio": 0.006200000178068876,
+    "partidos_temporada_anterior": 0.005400000140070915,
+    "dias_baja_previos": 0.004999999888241291,
+    "lesiones_previas": 0.004000000189989805,
+    "edad": 0.0038999998942017555,
+    "altura_cm": 0.0031999999191612005,
+    "lesiones_previas_mismo_tipo": 0.0031999999191612005
+  },
+  "n_lesiones_entrenamiento": 11316,
+  "n_jugadores_entrenamiento": 3635,
+  "zona_por_tipo": {
+    "Cirugía (otra zona)": "Tobillo",
+    "Cirugía de rodilla": "Rodilla",
+    "Desgarro muscular": "No especificada",
+    "Esguince de tobillo": "Tobillo",
+    "Fatiga muscular": "No especificada",
+    "Fractura (otra zona)": "Pierna / pantorrilla",
+    "Fractura de pie": "Pie",
+    "Golpe / contusión": "No especificada",
+    "Inflamación / tendinitis": "No especificada",
+    "Lesión de aductores / ingle": "Ingle / aductores",
+    "Lesión de brazo / mano": "Brazo / mano",
+    "Lesión de cabeza / cuello": "Cabeza / cuello",
+    "Lesión de cadera": "Cadera",
+    "Lesión de espalda": "Espalda",
+    "Lesión de hombro": "Hombro",
+    "Lesión de isquiotibiales": "Muslo",
+    "Lesión de ligamento cruzado": "Rodilla",
+    "Lesión de ligamentos (otra zona)": "No especificada",
+    "Lesión de menisco": "Rodilla",
+    "Lesión de muslo": "Muslo",
+    "Lesión de pantorrilla (gemelo)": "Pierna / pantorrilla",
+    "Lesión de pie": "Pie",
+    "Lesión de pierna": "Pierna / pantorrilla",
+    "Lesión de rodilla": "Rodilla",
+    "Lesión de tobillo": "Tobillo",
+    "Lesión de tronco (costillas / abdomen)": "Tronco",
+    "Lesión del tendón de Aquiles": "Tobillo",
+    "Lesión muscular (sin zona)": "No especificada",
+    "Otra lesión": "No especificada"
+  },
+  "distribucion_tipos": [
+    {
+      "grupo": "Musculares",
+      "n": 5997,
+      "porcentaje": 53.0
+    },
+    {
+      "grupo": "Ligamentos y tendones",
+      "n": 950,
+      "porcentaje": 8.4
+    },
+    {
+      "grupo": "Articulares y otras zonas",
+      "n": 2899,
+      "porcentaje": 25.6
+    },
+    {
+      "grupo": "Óseas y quirúrgicas",
+      "n": 556,
+      "porcentaje": 4.9
+    },
+    {
+      "grupo": "Golpes y otras",
+      "n": 914,
+      "porcentaje": 8.1
+    }
+  ],
+  "mediana_dias_por_tipo": {
+    "Cirugía (otra zona)": 73,
+    "Cirugía de rodilla": 116,
+    "Desgarro muscular": 34,
+    "Esguince de tobillo": 24,
+    "Fatiga muscular": 8,
+    "Fractura (otra zona)": 46,
+    "Fractura de pie": 71,
+    "Golpe / contusión": 11,
+    "Inflamación / tendinitis": 18,
+    "Lesión de aductores / ingle": 18,
+    "Lesión de brazo / mano": 23,
+    "Lesión de cabeza / cuello": 11,
+    "Lesión de cadera": 16,
+    "Lesión de espalda": 13,
+    "Lesión de hombro": 33,
+    "Lesión de isquiotibiales": 28,
+    "Lesión de ligamento cruzado": 222,
+    "Lesión de ligamentos (otra zona)": 36,
+    "Lesión de menisco": 58,
+    "Lesión de muslo": 19,
+    "Lesión de pantorrilla (gemelo)": 24,
+    "Lesión de pie": 22,
+    "Lesión de pierna": 24,
+    "Lesión de rodilla": 28,
+    "Lesión de tobillo": 22,
+    "Lesión de tronco (costillas / abdomen)": 15,
+    "Lesión del tendón de Aquiles": 46,
+    "Lesión muscular (sin zona)": 18,
+    "Otra lesión": 18
+  },
+  "grupos_tipo": {
+    "Musculares": [
+      "Lesión de isquiotibiales",
+      "Lesión de pantorrilla (gemelo)",
+      "Lesión de aductores / ingle",
+      "Lesión de muslo",
+      "Desgarro muscular",
+      "Fatiga muscular",
+      "Lesión muscular (sin zona)"
+    ],
+    "Ligamentos y tendones": [
+      "Lesión de ligamento cruzado",
+      "Lesión de menisco",
+      "Esguince de tobillo",
+      "Lesión de ligamentos (otra zona)",
+      "Lesión del tendón de Aquiles",
+      "Inflamación / tendinitis"
+    ],
+    "Articulares y otras zonas": [
+      "Lesión de rodilla",
+      "Lesión de tobillo",
+      "Lesión de cadera",
+      "Lesión de hombro",
+      "Lesión de espalda",
+      "Lesión de pie",
+      "Lesión de pierna"
+    ],
+    "Óseas y quirúrgicas": [
+      "Fractura de pie",
+      "Fractura (otra zona)",
+      "Cirugía de rodilla",
+      "Cirugía (otra zona)"
+    ],
+    "Golpes y otras": [
+      "Golpe / contusión",
+      "Lesión de cabeza / cuello",
+      "Lesión de brazo / mano",
+      "Lesión de tronco (costillas / abdomen)",
+      "Otra lesión"
+    ]
+  },
+  "comparacion_modelos": [
+    {
+      "Modelo": "Línea base (mediana)",
+      "Validación": "Por jugador (GroupKFold)",
+      "MAE": 28.302,
+      "RMSE": 53.486,
+      "MedAE": 14.0,
+      "R2": -0.115
+    },
+    {
+      "Modelo": "Línea base (mediana)",
+      "Validación": "Temporal (23/24-24/25)",
+      "MAE": 29.986,
+      "RMSE": 56.894,
+      "MedAE": 14.0,
+      "R2": -0.143
+    },
+    {
+      "Modelo": "Random Forest",
+      "Validación": "Por jugador (GroupKFold)",
+      "MAE": 22.674,
+      "RMSE": 40.336,
+      "MedAE": 12.035,
+      "R2": 0.366
+    },
+    {
+      "Modelo": "Random Forest",
+      "Validación": "Temporal (23/24-24/25)",
+      "MAE": 23.838,
+      "RMSE": 42.678,
+      "MedAE": 12.103,
+      "R2": 0.357
+    },
+    {
+      "Modelo": "XGBoost",
+      "Validación": "Por jugador (GroupKFold)",
+      "MAE": 22.578,
+      "RMSE": 40.224,
+      "MedAE": 11.886,
+      "R2": 0.369
+    },
+    {
+      "Modelo": "XGBoost",
+      "Validación": "Temporal (23/24-24/25)",
+      "MAE": 23.827,
+      "RMSE": 42.475,
+      "MedAE": 12.058,
+      "R2": 0.363
+    }
+  ],
+  "temporadas": [
+    "20/21",
+    "21/22",
+    "22/23",
+    "23/24",
+    "24/25"
+  ]
+}
