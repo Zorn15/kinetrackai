@@ -3,112 +3,200 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>KineTrack AI · Estimación de recuperación</title>
+  <meta name="color-scheme" content="light dark">
+  <script>
+    // Preferencias guardadas, antes de pintar para evitar parpadeos
+    (function () {
+      try {
+        document.querySelector('meta[name="color-scheme"]').content = localStorage.getItem("color-scheme") || "light dark";
+        var acc = JSON.parse(localStorage.getItem("kt-accesibilidad") || "{}"), html = document.documentElement;
+        if (acc.escala) html.style.setProperty("--escala-texto", acc.escala);
+        if (acc.contraste === "alto") html.dataset.contraste = "alto";
+        if (acc.movimiento) html.dataset.movimiento = acc.movimiento;
+        if (localStorage.getItem("kt-idioma") === "en") html.lang = "en";
+      } catch (e) {}
+    })();
+  </script>
+  <meta name="theme-color" content="#f6f8fa" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0e141c" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="KineTrack AI estima el tiempo de recuperación de lesiones en futbolistas con machine learning." data-i18n-content="meta.descripcion">
+  <title>Formulario – KineTrack AI</title>
   <link rel="stylesheet" href="fuentes/fuentes.css">
   <link rel="stylesheet" href="estilos.css">
+  <script type="module">
+    // Polyfill solo para navegadores sin Popover API
+    if (!("popover" in HTMLElement.prototype)) import("https://unpkg.com/@oddbird/popover-polyfill@latest/dist/popover.min.js");
+  </script>
 </head>
 <body>
+
+<a class="saltar" href="#contenido" data-i18n="saltar">Saltar al contenido</a>
 
 <!-- ====================== ENCABEZADO ====================== -->
 <header class="topbar">
   <div class="topbar__inner">
     <div class="brand">
-      <div class="brand__logo"><span class="ms">monitor_heart</span></div>
-      <div>
-        <div class="brand__row">
-          <span class="brand__name">KineTrack AI</span>
-          <span class="badge badge--cyan" id="badge-modelo">ML</span>
-        </div>
-        <span class="brand__sub" id="vista-actual">Formulario</span>
-      </div>
+      <div class="brand__logo"><span class="ms" aria-hidden="true">monitor_heart</span></div>
+      <span class="brand__name">KineTrack AI</span>
     </div>
-    <!-- navegacion de escritorio -->
-    <nav class="topnav" aria-label="Secciones">
-      <button class="topnav__item is-active" data-vista="formulario"><span class="ms">assignment</span>Formulario</button>
-      <button class="topnav__item" data-vista="resultado" disabled><span class="ms">monitoring</span>Resultado ML</button>
-      <button class="topnav__item" data-vista="modelo"><span class="ms">neurology</span>Modelo &amp; Info</button>
-    </nav>
+    <div class="topbar__der">
+      <nav class="topnav" aria-label="Secciones principales" data-i18n-aria="nav.secciones">
+        <button type="button" class="topnav__item is-active" data-vista="formulario" aria-current="page"><span class="ms" aria-hidden="true">assignment</span><span data-i18n="nav.formulario">Formulario</span></button>
+        <button type="button" class="topnav__item" data-vista="resultado" disabled><span class="ms" aria-hidden="true">monitoring</span><span data-i18n="nav.resultado">Resultado ML</span></button>
+        <button type="button" class="topnav__item" data-vista="modelo"><span class="ms" aria-hidden="true">neurology</span><span data-i18n="nav.modelo">Modelo &amp; Info</span></button>
+      </nav>
+      <button type="button" class="herramienta" id="btn-ajustes" popovertarget="panel-ajustes">
+        <span class="ms" aria-hidden="true">settings_accessibility</span><span class="herramienta__txt" data-i18n="ajustes.boton">Ajustes</span>
+      </button>
+    </div>
   </div>
 </header>
 
-<main class="contenedor">
+<!-- ====================== PANEL DE AJUSTES ====================== -->
+<div class="panel-acc" id="panel-ajustes" popover role="dialog" aria-labelledby="panel-acc-titulo">
+  <div class="panel-acc__cab">
+    <h2 class="panel-acc__titulo" id="panel-acc-titulo"><span class="ms" aria-hidden="true">settings_accessibility</span><span data-i18n="ajustes.titulo">Ajustes</span></h2>
+    <button type="button" class="panel-acc__cerrar" popovertarget="panel-ajustes" popovertargetaction="hide" aria-label="Cerrar" data-i18n-aria="acc.cerrar"><span class="ms" aria-hidden="true">close</span></button>
+  </div>
 
-  <!-- =========================================================
-       VISTA 1: FORMULARIO (RF-01, RF-02, RF-03, RF-04)
-       ========================================================= -->
-  <section class="vista is-visible" id="vista-formulario">
+  <div class="acc-bloque">
+    <span class="acc-bloque__tit" id="idioma-lbl" data-i18n="ajustes.idioma">Idioma</span>
+    <div class="segmentado" role="group" aria-labelledby="idioma-lbl">
+      <button type="button" data-idioma="es" lang="es">Español</button>
+      <button type="button" data-idioma="en" lang="en">English</button>
+    </div>
+  </div>
+
+  <div class="acc-bloque">
+    <span class="acc-bloque__tit" id="tema-lbl" data-i18n="ajustes.tema">Tema</span>
+    <div class="segmentado" role="group" aria-labelledby="tema-lbl">
+      <button type="button" data-tema=""><span class="ms ms-sm" aria-hidden="true">contrast</span><span data-i18n="tema.sistema">Sistema</span></button>
+      <button type="button" data-tema="light"><span class="ms ms-sm" aria-hidden="true">light_mode</span><span data-i18n="tema.dia">Día</span></button>
+      <button type="button" data-tema="dark"><span class="ms ms-sm" aria-hidden="true">dark_mode</span><span data-i18n="tema.noche">Noche</span></button>
+    </div>
+  </div>
+
+  <h3 class="acc-seccion" data-i18n="acc.titulo">Accesibilidad</h3>
+
+  <div class="acc-fila">
+    <div>
+      <strong id="acc-letra-lbl" data-i18n="acc.letra">Tamaño del texto</strong>
+      <span class="texto-sec" data-i18n="acc.letra.ayuda">Agranda o reduce las letras de toda la página.</span>
+    </div>
+    <div class="acc-letra" role="group" aria-labelledby="acc-letra-lbl">
+      <button type="button" class="acc-letra__btn" id="btn-letra-menos" aria-label="Reducir texto" data-i18n-aria="acc.letra.menos">A<small>−</small></button>
+      <output class="acc-letra__valor" id="acc-letra-valor" aria-live="polite">100%</output>
+      <button type="button" class="acc-letra__btn acc-letra__btn--mas" id="btn-letra-mas" aria-label="Agrandar texto" data-i18n-aria="acc.letra.mas">A<small>+</small></button>
+    </div>
+  </div>
+
+  <div class="acc-fila">
+    <div>
+      <label for="sw-contraste"><strong data-i18n="acc.contraste">Súper contraste</strong></label>
+      <span class="texto-sec" id="sw-contraste-ayuda" data-i18n="acc.contraste.ayuda">Colores de máximo contraste y bordes marcados para ver mejor.</span>
+    </div>
+    <input type="checkbox" role="switch" class="switch" id="sw-contraste" aria-describedby="sw-contraste-ayuda">
+  </div>
+
+  <div class="acc-fila">
+    <div>
+      <label for="sw-movimiento"><strong data-i18n="acc.movimiento">Reducir animaciones</strong></label>
+      <span class="texto-sec" id="acc-movimiento-ayuda" data-i18n="acc.movimiento.ayuda">Detiene los movimientos, transiciones y el punto que late.</span>
+    </div>
+    <input type="checkbox" role="switch" class="switch" id="sw-movimiento" aria-describedby="acc-movimiento-ayuda">
+  </div>
+
+  <button type="button" class="btn btn--sec acc-restablecer" id="btn-acc-restablecer"><span class="ms" aria-hidden="true">restart_alt</span><span data-i18n="acc.restablecer">Restablecer</span></button>
+</div>
+
+<main class="contenedor" id="contenido">
+
+  <!-- ====================== VISTA 1: FORMULARIO ====================== -->
+  <section class="vista is-visible" id="vista-formulario" aria-labelledby="t-formulario">
 
     <div class="card card--hero">
-      <div class="hero__top">
-        <span class="chip chip--teal"><span class="ms ms-sm">verified_user</span>Protocolo clínico · RF-01 – RF-04</span>
-      </div>
-      <h1 class="h-hero">Nueva Evaluación Lesional</h1>
-      <p class="texto-sec">Estimación del tiempo de retorno al juego (RTP) a partir de datos históricos de lesiones en el fútbol profesional.</p>
+      <h1 class="h-hero" id="t-formulario" tabindex="-1" data-i18n="form.titulo">Nueva Evaluación Lesional</h1>
+      <p class="texto-sec" data-i18n="form.subtitulo">Estimación del tiempo de retorno al juego (RTP) a partir de datos históricos de lesiones en el fútbol profesional.</p>
+      <p class="instrucciones" data-i18n="form.instrucciones">Completa las tres secciones y pulsa <b>Calcular Estimación ML</b>. Todos los campos traen un valor inicial; los marcados como <em>opcional</em> no cambian la estimación.</p>
+      <p class="aviso-privacidad"><span class="ms ms-sm" aria-hidden="true">lock</span><span data-i18n="form.privacidad">Los datos solo se usan para calcular la estimación y no se almacenan.</span></p>
       <div class="pasos">
-        <a class="paso" href="#sec-jugador" data-paso="jugador"><span class="ms ms-sm">person</span>1. Jugador<i></i></a>
-        <a class="paso" href="#sec-lesion" data-paso="lesion"><span class="ms ms-sm">personal_injury</span>2. Lesión<i></i></a>
-        <a class="paso" href="#sec-historial" data-paso="historial"><span class="ms ms-sm">history</span>3. Historial<i></i></a>
+        <a class="paso" href="#sec-jugador" data-paso="jugador"><span class="ms ms-sm" aria-hidden="true">person</span><span data-i18n="form.paso1">1. Jugador</span><i></i></a>
+        <a class="paso" href="#sec-lesion" data-paso="lesion"><span class="ms ms-sm" aria-hidden="true">personal_injury</span><span data-i18n="form.paso2">2. Lesión</span><i></i></a>
+        <a class="paso" href="#sec-historial" data-paso="historial"><span class="ms ms-sm" aria-hidden="true">history</span><span data-i18n="form.paso3">3. Historial</span><i></i></a>
       </div>
     </div>
 
     <form id="formulario" novalidate>
 
-      <!-- ---------- 1. DATOS DEL JUGADOR ---------- -->
+      <!-- ---------- RF-01 Datos del jugador ---------- -->
       <div class="card" id="sec-jugador">
         <div class="card__head">
-          <h2 class="h-sec"><span class="ms icono-sec">badge</span>1. Datos del Jugador</h2>
-          <span class="rf">RF-01</span>
+          <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">badge</span><span data-i18n="jug.titulo">1. Datos del Jugador</span></h2>
         </div>
 
-        <label class="campo">
-          <span class="etiqueta">Nombre o referencia <em>(opcional, no se guarda)</em></span>
-          <input type="text" id="nombre" class="input" placeholder="Ej: Jugador #12" maxlength="40" autocomplete="off">
-        </label>
+        <div class="grid-2">
+          <label class="campo">
+            <span class="etiqueta" data-i18n="jug.nombre">Nombre <em>(opcional, no se guarda)</em></span>
+            <input type="text" id="nombre" class="input" placeholder="Ej: Juan o Jugador #12" data-i18n-ph="jug.nombre.ph" maxlength="40" autocomplete="off">
+          </label>
+          <label class="campo">
+            <span class="etiqueta" data-i18n="jug.apellido">Apellido <em>(opcional)</em></span>
+            <input type="text" id="apellido" class="input" placeholder="Ej: Vanegas" data-i18n-ph="jug.apellido.ph" maxlength="40" autocomplete="off">
+          </label>
+        </div>
 
         <div class="grid-2">
           <div class="campo">
-            <span class="etiqueta">Edad <span class="etq-acento">años</span></span>
-            <div class="stepper" data-campo="edad" data-min="16" data-max="42">
-              <button type="button" class="stepper__btn" data-paso="-1" aria-label="Restar">−</button>
+            <span class="etiqueta"><span id="edad-lbl" data-i18n="jug.edad">Edad</span> <span class="etq-acento" data-i18n="jug.anios">años</span></span>
+            <div class="stepper" data-campo="edad" data-min="16" data-max="42" role="group" aria-labelledby="edad-lbl">
+              <button type="button" class="stepper__btn" data-paso="-1" aria-label="Restar" data-i18n-aria="restar">−</button>
               <output class="stepper__valor" id="edad">26</output>
-              <button type="button" class="stepper__btn" data-paso="1" aria-label="Sumar">+</button>
+              <button type="button" class="stepper__btn" data-paso="1" aria-label="Sumar" data-i18n-aria="sumar">+</button>
             </div>
           </div>
           <div class="campo">
-            <span class="etiqueta">Estatura <span class="etq-acento" id="altura-txt">182 cm</span></span>
-            <input type="range" id="altura_cm" class="slider" min="155" max="205" value="182">
+            <span class="etiqueta"><span data-i18n="jug.estatura">Estatura</span> <span class="etq-acento" id="altura-txt">182 cm</span></span>
+            <input type="range" id="altura_cm" aria-label="Estatura en centímetros" data-i18n-aria="jug.estatura.aria" class="slider" min="155" max="205" value="182">
             <div class="slider__marcas"><span>1.55 m</span><span>2.05 m</span></div>
           </div>
         </div>
 
         <div class="campo">
-          <span class="etiqueta">Posición táctica</span>
-          <div id="posiciones" class="posiciones"></div>
+          <span class="etiqueta"><span id="pos-lbl" data-i18n="jug.posicion">Posición táctica</span> <span class="etq-acento" id="pos-elegida">—</span></span>
+          <div id="posiciones" class="cancha" role="group" aria-labelledby="pos-lbl"></div>
         </div>
 
-        <label class="campo">
-          <span class="etiqueta">Equipo <em>(opcional, solo informativo)</em></span>
-          <div class="select-wrap">
-            <select id="equipo" class="input"></select>
-            <span class="ms">unfold_more</span>
+        <div class="grid-2">
+          <div class="campo">
+            <label class="etiqueta" for="pais" data-i18n="jug.pais">País del club <em>(opcional)</em></label>
+            <div class="select-wrap">
+              <select id="pais" class="input"></select>
+              <span class="ms" aria-hidden="true">public</span>
+            </div>
           </div>
-        </label>
+          <div class="campo">
+            <label class="etiqueta" for="equipo" data-i18n="jug.equipo">Equipo <em>(opcional, solo informativo)</em></label>
+            <div class="select-wrap">
+              <select id="equipo" class="input"></select>
+              <span class="ms" aria-hidden="true">unfold_more</span>
+            </div>
+          </div>
+        </div>
 
         <div class="campo">
-          <span class="etiqueta">Lateralidad / pie hábil</span>
-          <div class="segmentado" id="pie_habil"></div>
+          <span class="etiqueta" id="pie-lbl" data-i18n="jug.pie">Lateralidad / pie hábil</span>
+          <div class="segmentado" id="pie_habil" role="group" aria-labelledby="pie-lbl"></div>
         </div>
       </div>
 
-      <!-- ---------- 2. DATOS DE LA LESION ---------- -->
+      <!-- ---------- RF-02 Datos de la lesion ---------- -->
       <div class="card" id="sec-lesion">
         <div class="card__head">
-          <h2 class="h-sec"><span class="ms icono-sec">medical_services</span>2. Datos de la Lesión</h2>
-          <span class="rf">RF-02</span>
+          <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">medical_services</span><span data-i18n="les.titulo">2. Datos de la Lesión</span></h2>
         </div>
 
         <div class="campo">
-          <span class="etiqueta">Tipo de diagnóstico clínico</span>
+          <span class="etiqueta" data-i18n="les.tipo">Tipo de diagnóstico clínico</span>
           <div class="diag">
             <div class="diag__fila">
               <span class="punto"></span>
@@ -119,13 +207,13 @@
           </div>
           <div class="chips-rapidos" id="tipos-rapidos"></div>
           <div class="select-wrap">
-            <select id="tipo_lesion" class="input" aria-label="Todos los tipos de lesión"></select>
-            <span class="ms">unfold_more</span>
+            <select id="tipo_lesion" class="input" aria-label="Todos los tipos de lesión" data-i18n-aria="les.todos.aria"></select>
+            <span class="ms" aria-hidden="true">unfold_more</span>
           </div>
         </div>
 
         <div class="campo">
-          <span class="etiqueta">Topografía anatómica <span class="etq-acento">Zona del cuerpo</span></span>
+          <span class="etiqueta"><span data-i18n="les.topografia">Topografía anatómica</span> <span class="etq-acento" data-i18n="les.zona">Zona del cuerpo</span></span>
           <div class="topografia">
             <div class="silueta">
               <svg viewBox="0 0 120 240" aria-hidden="true">
@@ -147,107 +235,105 @@
               </svg>
               <span class="silueta__tag" id="zona-tag">—</span>
             </div>
-            <div class="lista-zonas" id="zona_cuerpo" role="radiogroup" aria-label="Zona del cuerpo"></div>
+            <div class="lista-zonas" id="zona_cuerpo" role="group" aria-label="Zona del cuerpo" data-i18n-aria="les.zona"></div>
           </div>
+          <p class="nota-auto" id="zona-sugerida" aria-live="polite"></p>
         </div>
 
-        <label class="campo">
-          <span class="etiqueta">Fecha y momento del evento</span>
+        <div class="campo">
+          <label class="etiqueta" for="fecha" data-i18n="les.fecha">Fecha de la lesión</label>
           <div class="fecha">
-            <span class="ms fecha__icono">calendar_month</span>
+            <span class="ms fecha__icono" aria-hidden="true">calendar_month</span>
             <div class="fecha__txt">
-              <input type="date" id="fecha" class="input input--fecha">
+              <input type="date" id="fecha" class="input input--fecha" aria-describedby="fecha-hace">
               <span class="fecha__hace" id="fecha-hace">—</span>
             </div>
           </div>
-        </label>
+        </div>
       </div>
 
-      <!-- ---------- 3. HISTORIAL ---------- -->
+      <!-- ---------- RF-03 Historial ---------- -->
       <div class="card" id="sec-historial">
         <div class="card__head">
-          <h2 class="h-sec"><span class="ms icono-sec ambar">trending_up</span>3. Historial Deportivo Clínico</h2>
-          <span class="rf">RF-03</span>
+          <h2 class="h-sec"><span class="ms icono-sec ambar" aria-hidden="true">trending_up</span><span data-i18n="his.titulo">3. Historial Deportivo Clínico</span></h2>
         </div>
 
         <div class="fila-stepper">
           <div>
-            <strong>Lesiones previas</strong>
-            <span class="texto-sec">Total de lesiones antes de esta</span>
+            <strong id="lp-lbl" data-i18n="his.previas">Lesiones previas</strong>
+            <span class="texto-sec" data-i18n="his.previas.ayuda">Total de lesiones antes de esta</span>
           </div>
-          <div class="stepper" data-campo="lesiones_previas" data-min="0" data-max="50">
-            <button type="button" class="stepper__btn" data-paso="-1" aria-label="Restar">−</button>
+          <div class="stepper" data-campo="lesiones_previas" data-min="0" data-max="50" role="group" aria-labelledby="lp-lbl">
+            <button type="button" class="stepper__btn" data-paso="-1" aria-label="Restar" data-i18n-aria="restar">−</button>
             <output class="stepper__valor" id="lesiones_previas">0</output>
-            <button type="button" class="stepper__btn" data-paso="1" aria-label="Sumar">+</button>
+            <button type="button" class="stepper__btn" data-paso="1" aria-label="Sumar" data-i18n-aria="sumar">+</button>
           </div>
         </div>
 
         <div class="fila-stepper">
           <div>
-            <strong>Recaídas del mismo tipo</strong>
-            <span class="texto-sec">Lesiones previas del mismo diagnóstico</span>
+            <strong id="lmt-lbl" data-i18n="his.recaidas">Recaídas del mismo tipo</strong>
+            <span class="texto-sec" data-i18n="his.recaidas.ayuda">Lesiones previas del mismo diagnóstico</span>
           </div>
-          <div class="stepper" data-campo="lesiones_previas_mismo_tipo" data-min="0" data-max="50">
-            <button type="button" class="stepper__btn" data-paso="-1" aria-label="Restar">−</button>
+          <div class="stepper" data-campo="lesiones_previas_mismo_tipo" data-min="0" data-max="50" role="group" aria-labelledby="lmt-lbl">
+            <button type="button" class="stepper__btn" data-paso="-1" aria-label="Restar" data-i18n-aria="restar">−</button>
             <output class="stepper__valor" id="lesiones_previas_mismo_tipo">0</output>
-            <button type="button" class="stepper__btn" data-paso="1" aria-label="Sumar">+</button>
+            <button type="button" class="stepper__btn" data-paso="1" aria-label="Sumar" data-i18n-aria="sumar">+</button>
           </div>
         </div>
 
         <div class="campo campo--slider">
-          <div class="slider-cab"><span>Días de baja acumulados</span><b class="num-ambar" id="dias_baja_previos-txt">0 días</b></div>
-          <input type="range" id="dias_baja_previos" class="slider slider--ambar" min="0" max="600" value="0">
-          <div class="slider__marcas"><span>0 días</span><span>300</span><span>600+ días</span></div>
+          <div class="slider-cab"><span data-i18n="his.acumulados">Días de baja acumulados</span><b class="num-ambar" id="dias_baja_previos-txt">0 días</b></div>
+          <input type="range" id="dias_baja_previos" aria-label="Días de baja acumulados" data-i18n-aria="his.acumulados" class="slider slider--ambar" min="0" max="600" value="0">
+          <div class="slider__marcas"><span data-i18n="his.marca0">0 días</span><span>300</span><span data-i18n="his.marca600">600+ días</span></div>
         </div>
 
         <div class="campo campo--slider">
-          <div class="slider-cab"><span>Días de baja en los últimos 12 meses</span><b class="num-cyan" id="dias_baja_ultimo_anio-txt">0 días</b></div>
-          <input type="range" id="dias_baja_ultimo_anio" class="slider" min="0" max="365" value="0">
-          <div class="slider__marcas"><span>0</span><span>180</span><span>365 días</span></div>
+          <div class="slider-cab"><span data-i18n="his.ultimo">Días de baja en los últimos 12 meses</span><b class="num-cyan" id="dias_baja_ultimo_anio-txt">0 días</b></div>
+          <input type="range" id="dias_baja_ultimo_anio" aria-label="Días de baja en los últimos 12 meses" data-i18n-aria="his.ultimo" class="slider" min="0" max="365" value="0">
+          <div class="slider__marcas"><span>0</span><span>180</span><span data-i18n="his.marca365">365 días</span></div>
         </div>
 
         <div class="campo campo--slider">
-          <div class="slider-cab"><span>Partidos jugados la temporada anterior</span><b class="num-cyan" id="partidos_temporada_anterior-txt">25 partidos</b></div>
-          <input type="range" id="partidos_temporada_anterior" class="slider" min="0" max="70" value="25">
+          <div class="slider-cab"><span data-i18n="his.partidos">Partidos jugados la temporada anterior</span><b class="num-cyan" id="partidos_temporada_anterior-txt">25 partidos</b></div>
+          <input type="range" id="partidos_temporada_anterior" aria-label="Partidos jugados la temporada anterior" data-i18n-aria="his.partidos" class="slider" min="0" max="70" value="25">
           <div class="slider__marcas"><span>0</span><span>35</span><span>70</span></div>
         </div>
       </div>
 
-      <!-- ---------- CONTROL DE INTEGRIDAD (RF-04) ---------- -->
+      <!-- ---------- RF-04 Control de integridad ---------- -->
       <div class="integridad" id="integridad">
-        <span class="ms">task_alt</span>
-        <div>
-          <strong>Control de integridad RF-04</strong>
+        <span class="ms" aria-hidden="true">task_alt</span>
+        <div aria-live="polite">
+          <strong data-i18n="int.titulo">Revisión de los datos</strong>
           <span id="integridad-txt">Todos los campos validados.</span>
           <ul id="integridad-errores"></ul>
         </div>
       </div>
 
       <div class="acciones">
-        <button type="button" class="btn btn--sec" id="btn-limpiar"><span class="ms">restart_alt</span>Limpiar</button>
-        <button type="submit" class="btn btn--pri" id="btn-calcular">Calcular Estimación ML<span class="ms">arrow_forward</span></button>
+        <button type="button" class="btn btn--sec" id="btn-limpiar"><span class="ms" aria-hidden="true">restart_alt</span><span data-i18n="btn.limpiar">Limpiar</span></button>
+        <button type="submit" class="btn btn--pri" id="btn-calcular"><span class="btn__txt">Calcular Estimación ML</span><span class="ms btn__ic" aria-hidden="true">arrow_forward</span></button>
       </div>
-      <p class="pie-form"><span class="ms ms-sm">lock</span>Los datos solo se usan para calcular la estimación y no se almacenan (RNF-07).</p>
     </form>
   </section>
 
-  <!-- =========================================================
-       VISTA 2: RESULTADO (RF-05 a RF-09)
-       ========================================================= -->
-  <section class="vista" id="vista-resultado">
+  <!-- ====================== VISTA 2: RESULTADO ====================== -->
+  <section class="vista" id="vista-resultado" aria-labelledby="r-titulo">
+    <h1 class="sr-only" tabindex="-1" id="r-titulo">Resultado de la estimación</h1>
     <div class="card card--jugador">
       <div class="jugador">
-        <div class="avatar"><span class="ms">sports_soccer</span></div>
+        <div class="avatar"><span class="ms" aria-hidden="true">sports_soccer</span></div>
         <div class="jugador__datos">
           <strong class="jugador__nombre" id="r-nombre">—</strong>
           <span class="chip chip--teal chip--mini" id="r-edad">—</span>
-          <span class="jugador__pos"><span class="ms ms-sm">sports</span><span id="r-posicion">—</span></span>
+          <span class="jugador__pos"><span class="ms ms-sm" aria-hidden="true">sports</span><span id="r-posicion">—</span></span>
         </div>
       </div>
       <div class="diag-res">
-        <span class="ms diag-res__ic">healing</span>
+        <span class="ms diag-res__ic" aria-hidden="true">healing</span>
         <div>
-          <span class="mini-cap">Diagnóstico registrado</span>
+          <span class="mini-cap" data-i18n="res.diagnostico">Diagnóstico registrado</span>
           <strong id="r-diagnostico">—</strong>
         </div>
       </div>
@@ -256,15 +342,14 @@
     <div class="grid-res">
       <div class="card card--rtp">
         <div class="rtp__top">
-          <span class="chip chip--teal"><span class="ms ms-sm">timer</span>Retorno estimado al juego (RTP)</span>
-          <span class="modelo-tag"><span class="ms ms-sm">memory</span><span id="r-modelo">XGBoost</span></span>
+          <h2 class="chip chip--teal chip--titulo"><span class="ms ms-sm" aria-hidden="true">timer</span><span data-i18n="res.rtp">Retorno estimado al juego (RTP)</span></h2>
         </div>
 
         <div class="anillo">
-          <svg viewBox="0 0 200 200">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
             <defs>
               <linearGradient id="grad-anillo" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#29a195"/><stop offset="100%" stop-color="#4cd7f6"/>
+                <stop class="anillo__a" offset="0%"/><stop class="anillo__b" offset="100%"/>
               </linearGradient>
             </defs>
             <circle class="anillo__fondo" cx="100" cy="100" r="82"/>
@@ -272,24 +357,24 @@
           </svg>
           <div class="anillo__centro">
             <b id="r-dias">—</b>
-            <span>días estimados</span>
+            <span data-i18n="res.dias">días estimados</span>
           </div>
         </div>
 
-        <div class="alta"><span class="ms ms-sm">event_available</span>Alta competitiva aprox.: <b id="r-fecha-alta">—</b></div>
+        <div class="alta"><span class="ms ms-sm" aria-hidden="true">event_available</span><span data-i18n="res.alta">Alta competitiva aprox.:</span> <b id="r-fecha-alta">—</b></div>
 
         <div class="rango">
-          <span>Rango probable: <b id="r-rango">—</b></span>
+          <span><span data-i18n="res.rango">Rango probable:</span> <b id="r-rango">—</b></span>
           <small id="r-rango-nota">—</small>
         </div>
 
         <div class="fases">
-          <div class="fases__cab"><span class="mini-cap">Línea de tiempo estimada</span><span class="texto-cyan">Según el modelo</span></div>
+          <div class="fases__cab"><span class="mini-cap" data-i18n="res.linea">Línea de tiempo estimada</span><span class="texto-cyan" data-i18n="res.segun">Según el modelo</span></div>
           <div class="fases__barra"><i class="f1"></i><i class="f2"></i><i class="f3"></i></div>
-          <div class="fase"><span class="fase__n">01</span><div><strong>Lesión registrada</strong><small id="t-lesion">—</small></div><span class="fase__dia">Día 0</span></div>
-          <div class="fase"><span class="fase__n">02</span><div><strong>Retorno más temprano probable</strong><small id="t-min">—</small></div><span class="fase__dia" id="t-min-dia">—</span></div>
-          <div class="fase fase--clave"><span class="fase__n">03</span><div><strong>Retorno estimado</strong><small id="t-est">—</small></div><span class="fase__dia" id="t-est-dia">—</span></div>
-          <div class="fase fase--ambar"><span class="fase__n">04</span><div><strong>Retorno más tardío probable</strong><small id="t-max">—</small></div><span class="fase__dia" id="t-max-dia">—</span></div>
+          <div class="fase" style="--i:0"><span class="fase__n">01</span><div><strong data-i18n="res.f1">Lesión registrada</strong><small id="t-lesion">—</small></div><span class="fase__dia" id="t-lesion-dia">Día 0</span></div>
+          <div class="fase" style="--i:1"><span class="fase__n">02</span><div><strong data-i18n="res.f2">Retorno más temprano probable</strong><small id="t-min">—</small></div><span class="fase__dia" id="t-min-dia">—</span></div>
+          <div class="fase fase--clave" style="--i:2"><span class="fase__n">03</span><div><strong data-i18n="res.f3">Retorno estimado</strong><small id="t-est">—</small></div><span class="fase__dia" id="t-est-dia">—</span></div>
+          <div class="fase fase--ambar" style="--i:3"><span class="fase__n">04</span><div><strong data-i18n="res.f4">Retorno más tardío probable</strong><small id="t-max">—</small></div><span class="fase__dia" id="t-max-dia">—</span></div>
         </div>
       </div>
 
@@ -297,106 +382,104 @@
         <div class="card">
           <div class="card__head card__head--top">
             <div>
-              <h2 class="h-sec"><span class="ms icono-sec">bar_chart</span>Explicabilidad</h2>
-              <span class="texto-sec">Variables más influyentes en el pronóstico (RF-07)</span>
+              <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">bar_chart</span><span data-i18n="res.explicabilidad">Explicabilidad</span></h2>
+              <span class="texto-sec" data-i18n="res.explicabilidad.sub">Variables que más influyeron en este pronóstico</span>
             </div>
-            <span class="valor-base">Valor base:<b id="r-base">—</b></span>
+            <span class="valor-base"><span data-i18n="res.base">Valor base:</span><b id="r-base">—</b></span>
           </div>
           <div id="r-influyentes" class="influyentes"></div>
           <div class="resumen">
-            <span class="ms">neurology</span>
+            <span class="ms" aria-hidden="true">neurology</span>
             <p id="r-resumen">—</p>
           </div>
         </div>
 
         <div class="card card--aviso">
-          <span class="ms aviso__ic">stethoscope</span>
+          <span class="ms aviso__ic" aria-hidden="true">stethoscope</span>
           <div>
-            <h3>Aviso clínico importante <span class="ms ms-sm">warning</span></h3>
-            <p>Esta estimación es una herramienta de apoyo basada en datos históricos y no reemplaza el criterio, diagnóstico ni alta médica del médico o fisioterapeuta del club (RF-08).</p>
+            <h3><span data-i18n="res.aviso">Aviso clínico importante</span> <span class="ms ms-sm" aria-hidden="true">warning</span></h3>
+            <p data-i18n="res.aviso.txt">Esta estimación es una herramienta de apoyo basada en datos históricos y no reemplaza el criterio, diagnóstico ni alta médica del médico o fisioterapeuta del club.</p>
           </div>
         </div>
 
         <div class="acciones acciones--res">
-          <button type="button" class="btn btn--sec" id="btn-imprimir"><span class="ms">picture_as_pdf</span>Guardar PDF</button>
-          <button type="button" class="btn btn--sec" id="btn-nueva"><span class="ms">refresh</span>Nueva consulta</button>
+          <button type="button" class="btn btn--sec" id="btn-imprimir"><span class="ms" aria-hidden="true">picture_as_pdf</span><span data-i18n="btn.pdf">Guardar informe PDF</span></button>
+          <button type="button" class="btn btn--sec" id="btn-nueva"><span class="ms" aria-hidden="true">refresh</span><span data-i18n="btn.nueva">Nueva consulta</span></button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- =========================================================
-       VISTA 3: MODELO & INFO (RF-10)
-       ========================================================= -->
-  <section class="vista" id="vista-modelo">
+  <!-- ====================== VISTA 3: MODELO E INFO ====================== -->
+  <section class="vista" id="vista-modelo" aria-labelledby="t-modelo">
     <div class="info-hero">
       <div class="info-hero__chips">
-        <span class="chip chip--teal">RF-10 · Transparencia</span>
-        <span class="chip chip--sin"><span class="punto"></span>Modelo activo</span>
+        <span class="chip chip--sin"><span class="punto"></span><span data-i18n="mod.activo">Modelo activo</span></span>
       </div>
-      <h1 class="h-hero">Transparencia del Algoritmo ML</h1>
+      <h1 class="h-hero" id="t-modelo" tabindex="-1" data-i18n="mod.titulo">Transparencia del Algoritmo ML</h1>
       <p class="texto-sec" id="i-subtitulo">—</p>
     </div>
 
     <div class="grid-info">
       <div class="card">
         <div class="card__head">
-          <h2 class="h-sec"><span class="ms icono-sec">clinical_notes</span>Validación del modelo</h2>
-          <span class="chip chip--teal chip--mini">Por jugador</span>
+          <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">clinical_notes</span><span data-i18n="mod.validacion">Validación del modelo</span></h2>
+          <span class="chip chip--teal chip--mini" data-i18n="mod.porjugador">Por jugador</span>
         </div>
         <div class="metricas">
           <div class="metrica">
-            <span class="mini-cap">Error absoluto medio (MAE)</span>
-            <b class="metrica__num cyan">±<span id="i-mae">—</span><small>días</small></b>
-            <span class="texto-sec">En promedio la estimación se aleja eso del valor real</span>
+            <span class="mini-cap" data-i18n="mod.mae">Error absoluto medio (MAE)</span>
+            <b class="metrica__num cyan">±<span id="i-mae">—</span><small data-i18n="dias">días</small></b>
+            <span class="texto-sec" data-i18n="mod.mae.txt">En promedio la estimación se aleja eso del valor real</span>
           </div>
           <div class="metrica">
-            <span class="mini-cap">Error mediano (MedAE)</span>
-            <b class="metrica__num"><span id="i-medae">—</span><small>días</small></b>
-            <span class="texto-sec">La mitad de los casos tiene un error menor a este</span>
+            <span class="mini-cap" data-i18n="mod.medae">Error mediano (MedAE)</span>
+            <b class="metrica__num"><span id="i-medae">—</span><small data-i18n="dias">días</small></b>
+            <span class="texto-sec" data-i18n="mod.medae.txt">La mitad de los casos tiene un error menor a este</span>
           </div>
           <div class="metrica">
-            <span class="mini-cap">Coeficiente R²</span>
+            <span class="mini-cap" data-i18n="mod.r2">Coeficiente R²</span>
             <b class="metrica__num"><span id="i-r2">—</span></b>
-            <span class="texto-sec">Parte de la variación de los días que explica el modelo</span>
+            <span class="texto-sec" data-i18n="mod.r2.txt">Parte de la variación de los días que explica el modelo</span>
           </div>
         </div>
         <div class="casos">
-          <span class="ms">groups</span>
+          <span class="ms" aria-hidden="true">groups</span>
           <div><b id="i-casos">—</b><span class="texto-sec" id="i-casos-txt">—</span></div>
-          <span class="ms ok">verified</span>
+          <span class="ms ok" aria-hidden="true">verified</span>
         </div>
       </div>
 
       <div class="card">
         <div class="card__head">
-          <h2 class="h-sec"><span class="ms icono-sec">compare_arrows</span>Comparación de modelos</h2>
+          <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">compare_arrows</span><span data-i18n="mod.comparacion">Comparación de modelos</span></h2>
         </div>
         <div class="tabla-wrap">
           <table class="tabla" id="i-comparacion">
-            <thead><tr><th>Modelo</th><th>MAE<br><small>por jugador</small></th><th>MAE<br><small>temporal</small></th><th>R²</th></tr></thead>
+            <caption class="sr-only" data-i18n="mod.tabla.caption">Error de cada modelo según el tipo de validación</caption>
+            <thead><tr><th scope="col" data-i18n="mod.th.modelo">Modelo</th><th scope="col" data-i18n="mod.th.mae1">MAE<br><small>por jugador</small></th><th scope="col" data-i18n="mod.th.mae2">MAE<br><small>temporal</small></th><th scope="col">R²</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
-        <p class="texto-sec nota">Por jugador: un mismo jugador nunca está en entrenamiento y prueba a la vez. Temporal: entrena con 20/21–22/23 y prueba con 23/24–24/25.</p>
+        <p class="texto-sec nota" data-i18n="mod.nota">Por jugador: un mismo jugador nunca está en entrenamiento y prueba a la vez. Temporal: entrena con 20/21–22/23 y prueba con 23/24–24/25.</p>
       </div>
 
       <div class="card">
         <div class="card__head">
-          <h2 class="h-sec"><span class="ms icono-sec">database</span>Perfil del dataset</h2>
+          <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">database</span><span data-i18n="mod.dataset">Perfil del dataset</span></h2>
           <span class="mini-cap" id="i-temporadas">—</span>
         </div>
-        <span class="mini-cap teal">Fuentes de datos</span>
+        <span class="mini-cap teal" data-i18n="mod.fuentes">Fuentes de datos</span>
         <ul class="lista-ic">
-          <li><span class="ms">table_chart</span><span><b>European Football Injuries (2020-2025)</b> · Kaggle. Lesiones de la Premier League, La Liga, Serie A, Bundesliga y Ligue 1.</span></li>
-          <li><span class="ms">link</span><span><b>Football Datasets (Transfermarkt)</b> · Kaggle. Altura, pie hábil, historial de lesiones y partidos jugados de cada jugador.</span></li>
-          <li><span class="ms">filter_alt</span><span>Se excluyeron enfermedades (covid, gripa, etc.), registros duplicados y lesiones de más de un año.</span></li>
+          <li><span class="ms" aria-hidden="true">table_chart</span><span data-i18n="mod.fuente1"><b lang="en">European Football Injuries (2020-2025)</b> · Kaggle. Lesiones de la Premier League, La Liga, Serie A, Bundesliga y Ligue 1.</span></li>
+          <li><span class="ms" aria-hidden="true">link</span><span data-i18n="mod.fuente2"><b lang="en">Football Datasets (Transfermarkt)</b> · Kaggle. Altura, pie hábil, historial de lesiones y partidos jugados de cada jugador.</span></li>
+          <li><span class="ms" aria-hidden="true">filter_alt</span><span data-i18n="mod.fuente3">Se excluyeron enfermedades (covid, gripa, etc.), registros duplicados y lesiones de más de un año.</span></li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card__head">
-          <h2 class="h-sec">Distribución por tipo de lesión</h2>
+          <h2 class="h-sec" data-i18n="mod.distribucion">Distribución por tipo de lesión</h2>
           <span class="mini-cap" id="i-n">—</span>
         </div>
         <div class="dist-barra" id="i-dist-barra"></div>
@@ -405,51 +488,85 @@
 
       <div class="card">
         <div class="card__head">
-          <h2 class="h-sec"><span class="ms icono-sec">leaderboard</span>Importancia de variables</h2>
-          <span class="mini-cap">Global</span>
+          <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">leaderboard</span><span data-i18n="mod.importancia">Importancia de variables</span></h2>
+          <span class="mini-cap" data-i18n="mod.global">Global</span>
         </div>
         <div id="i-importancia" class="importancia"></div>
       </div>
 
       <div class="card">
-        <h2 class="h-sec h-ambar"><span class="ms">warning</span>Limitaciones conocidas del algoritmo</h2>
-        <p class="texto-sec">Aspectos a tener en cuenta antes de usar la estimación en decisiones clínicas:</p>
-        <div class="limitaciones">
-          <div class="lim"><span class="ms">group</span><div><b>1. Población de élite masculina</b><span>Solo aprendió de futbolistas profesionales hombres de las cinco grandes ligas europeas. En fútbol femenino, juvenil o amateur los tiempos pueden ser distintos.</span></div></div>
-          <div class="lim"><span class="ms">help</span><div><b>2. Sin grado ni tratamiento</b><span>Los datos no indican el grado de la lesión (I, II o III) ni el tratamiento aplicado, factores que cambian mucho la recuperación.</span></div></div>
-          <div class="lim"><span class="ms">history_toggle_off</span><div><b>3. Historial incompleto</b><span>Transfermarkt solo guarda las 15 lesiones más recientes de cada jugador, por lo que el historial previo puede quedar corto.</span></div></div>
-          <div class="lim"><span class="ms">trending_up</span><div><b>4. Casos largos o poco comunes</b><span>Las lesiones muy largas o poco frecuentes tienen más error, porque hay menos ejemplos de ellas en los datos.</span></div></div>
-        </div>
+        <h2 class="h-sec h-ambar"><span class="ms" aria-hidden="true">warning</span><span data-i18n="mod.limitaciones">Limitaciones conocidas del algoritmo</span></h2>
+        <p class="texto-sec" data-i18n="mod.limitaciones.sub">Aspectos a tener en cuenta antes de usar la estimación en decisiones clínicas:</p>
+        <ul class="limitaciones">
+          <li class="lim"><span class="ms" aria-hidden="true">group</span><div data-i18n="mod.lim1"><b>1. Población de élite masculina</b><span>Solo aprendió de futbolistas profesionales hombres de las cinco grandes ligas europeas. En fútbol femenino, juvenil o amateur los tiempos pueden ser distintos.</span></div></li>
+          <li class="lim"><span class="ms" aria-hidden="true">help</span><div data-i18n="mod.lim2"><b>2. Sin grado ni tratamiento</b><span>Los datos no indican el grado de la lesión (I, II o III) ni el tratamiento aplicado, factores que cambian mucho la recuperación.</span></div></li>
+          <li class="lim"><span class="ms" aria-hidden="true">history_toggle_off</span><div data-i18n="mod.lim3"><b>3. Historial incompleto</b><span>Transfermarkt solo guarda las 15 lesiones más recientes de cada jugador, por lo que el historial previo puede quedar corto.</span></div></li>
+          <li class="lim"><span class="ms" aria-hidden="true">trending_up</span><div data-i18n="mod.lim4"><b>4. Casos largos o poco comunes</b><span>Las lesiones muy largas o poco frecuentes tienen más error, porque hay menos ejemplos de ellas en los datos.</span></div></li>
+        </ul>
       </div>
 
       <div class="card card--ancho">
         <div class="card__head">
-          <h2 class="h-sec"><span class="ms icono-sec">account_tree</span>Pipeline de inferencia</h2>
-          <span class="mini-cap teal">Flujo de punta a punta</span>
+          <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">account_tree</span><span data-i18n="mod.pipeline">Pipeline de inferencia</span></h2>
+          <span class="mini-cap teal" data-i18n="mod.flujo">Flujo de punta a punta</span>
         </div>
         <ol class="pipeline">
-          <li><span>01</span><div><b>Ingreso de datos del jugador</b><small>Formulario: perfil, lesión e historial (RF-01 a RF-03).</small></div></li>
-          <li><span>02</span><div><b>Validación y preparación</b><small>Control de rangos (RF-04), One-Hot Encoding y relleno de faltantes.</small></div></li>
-          <li><span>03</span><div><b>Modelo <span class="js-modelo">XGBoost</span></b><small>Predice los días sobre una escala logarítmica y los devuelve a días.</small></div></li>
-          <li><span>04</span><div><b>Explicación por variable</b><small>Compara el caso con un jugador "típico" para ver qué suma o resta días.</small></div></li>
-          <li class="pipeline__fin"><span>05</span><div><b>Rango probable</b><small>Intervalo donde cayó el 50% de los casos parecidos durante la validación.</small></div></li>
+          <li><span>01</span><div data-i18n="mod.p1"><b>Ingreso de datos del jugador</b><small>Formulario: perfil, lesión e historial.</small></div></li>
+          <li><span>02</span><div data-i18n="mod.p2"><b>Validación y preparación</b><small>Control de rangos, One-Hot Encoding y relleno de faltantes.</small></div></li>
+          <li><span>03</span><div><b><span data-i18n="mod.p3.t">Modelo</span> <span class="js-modelo">XGBoost</span></b><small data-i18n="mod.p3">Predice los días sobre una escala logarítmica y los devuelve a días.</small></div></li>
+          <li><span>04</span><div data-i18n="mod.p4"><b>Explicación por variable</b><small>Compara el caso con un jugador "típico" para ver qué suma o resta días.</small></div></li>
+          <li class="pipeline__fin"><span>05</span><div data-i18n="mod.p5"><b>Rango probable</b><small>Intervalo donde cayó el 50% de los casos parecidos durante la validación.</small></div></li>
         </ol>
       </div>
     </div>
 
-    <p class="pie-info">KineTrack AI no reemplaza el juicio clínico de médicos y fisioterapeutas.</p>
+    <p class="pie-info" data-i18n="mod.pie">KineTrack AI no reemplaza el juicio clínico de médicos y fisioterapeutas.</p>
   </section>
 </main>
 
-<!-- ====================== NAVEGACION INFERIOR (movil) ====================== -->
-<nav class="bottomnav" aria-label="Secciones">
-  <button class="bottomnav__item is-active" data-vista="formulario"><span class="ms">assignment</span>Formulario</button>
-  <button class="bottomnav__item" data-vista="resultado" disabled><span class="ms">monitoring</span>Resultado ML</button>
-  <button class="bottomnav__item" data-vista="modelo"><span class="ms">neurology</span>Modelo &amp; Info</button>
+<!-- ====================== PIE DE PAGINA ====================== -->
+<footer class="pie">
+  <div class="pie__inner">
+    <nav class="pie__bloque" aria-labelledby="pie-mapa">
+      <h2 class="pie__titulo" id="pie-mapa" data-i18n="pie.mapa">Mapa del sitio</h2>
+      <ul class="pie__lista">
+        <li><a href="#formulario" data-i18n="pie.formulario">Formulario de evaluación</a>
+          <ul>
+            <li><a href="#sec-jugador" data-i18n="pie.jugador">Datos del jugador</a></li>
+            <li><a href="#sec-lesion" data-i18n="pie.lesion">Datos de la lesión</a></li>
+            <li><a href="#sec-historial" data-i18n="pie.historial">Historial deportivo</a></li>
+          </ul>
+        </li>
+        <li><a href="#resultado" data-i18n="pie.resultado">Resultado de la estimación</a></li>
+        <li><a href="#modelo" data-i18n="pie.modelo">Información y transparencia del modelo</a></li>
+      </ul>
+    </nav>
+    <section class="pie__bloque" aria-labelledby="pie-acc">
+      <h2 class="pie__titulo" id="pie-acc" data-i18n="pie.acc">Accesibilidad</h2>
+      <p data-i18n="pie.acc.txt">Este sitio sigue las directrices de accesibilidad web de la Resolución 1519 de 2020 de MinTIC (Anexo 1), basadas en WCAG 2.1 nivel AA.</p>
+    </section>
+  </div>
+  <p class="pie__creditos" data-i18n="pie.creditos">KineTrack AI · Proyecto de grado de Ingeniería de Sistemas · Fundación Universitaria Los Libertadores</p>
+</footer>
+
+<!-- ====================== NAVEGACION MOVIL ====================== -->
+<nav class="bottomnav" aria-label="Secciones principales (menú inferior)" data-i18n-aria="nav.secciones.movil">
+  <button type="button" class="bottomnav__item is-active" data-vista="formulario" aria-current="page"><span class="ms" aria-hidden="true">assignment</span><span data-i18n="nav.formulario">Formulario</span></button>
+  <button type="button" class="bottomnav__item" data-vista="resultado" disabled><span class="ms" aria-hidden="true">monitoring</span><span data-i18n="nav.resultado">Resultado ML</span></button>
+  <button type="button" class="bottomnav__item" data-vista="modelo"><span class="ms" aria-hidden="true">neurology</span><span data-i18n="nav.modelo">Modelo &amp; Info</span></button>
 </nav>
 
-<div class="toast" id="toast" role="alert"></div>
+<!-- Informe PDF: solo se ve al imprimir -->
+<article class="informe" id="informe"></article>
 
+<div class="toast" id="toast" role="alert">
+  <span class="ms" aria-hidden="true">error</span>
+  <span id="toast-txt"></span>
+  <button type="button" class="toast__cerrar" id="toast-cerrar" aria-label="Cerrar aviso" data-i18n-aria="toast.cerrar"><span class="ms" aria-hidden="true">close</span></button>
+</div>
+
+<script src="equipos.js"></script>
+<script src="i18n.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
