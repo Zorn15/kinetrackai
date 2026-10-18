@@ -1,13 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-prediccion.py
--------------
-Funcion que usa la web para estimar el tiempo de recuperacion.
-Carga el modelo guardado en el paso 2 y recibe los datos del formulario.
-
-Uso rapido (para probar sin la web):
-  python prediccion.py
-"""
+"""Estimacion del tiempo de recuperacion. Prueba rapida: python prediccion.py"""
 
 import json
 from pathlib import Path
@@ -19,9 +11,7 @@ CARPETA = Path(__file__).resolve().parent
 MODELO = joblib.load(CARPETA / "modelo" / "modelo_recuperacion.joblib")
 INFO = json.loads((CARPETA / "modelo" / "info_modelo.json").read_text(encoding="utf-8"))
 
-# Version "portable" (la que se sube a la nube): el ultimo paso del modelo viene como
-# el NOMBRE de un archivo .json con XGBoost guardado en su propio formato, que funciona
-# igual en Windows y en Linux. Aqui se carga y se pone en su lugar.
+# El ultimo paso puede venir como nombre de un .json de XGBoost; se carga aqui
 _nombre, _paso = MODELO.regressor_.steps[-1]
 if isinstance(_paso, str):
     from xgboost import XGBRegressor
@@ -31,7 +21,6 @@ if isinstance(_paso, str):
 
 VARIABLES = INFO["variables_categoricas"] + INFO["variables_numericas"]
 
-# Nombres "bonitos" para mostrar en la web
 NOMBRES = {
     "posicion": "Posición",
     "pie_habil": "Pie hábil",
@@ -54,26 +43,11 @@ def _predecir(datos):
 
 
 def estimar_recuperacion(datos):
-    """
-    datos: diccionario con las 13 variables, por ejemplo:
-        {"posicion": "Defensa central", "pie_habil": "Derecho",
-         "tipo_lesion": "Lesión de isquiotibiales", "zona_cuerpo": "Muslo",
-         "edad": 27, "altura_cm": 185, "mes_lesion": 10,
-         "lesiones_previas": 3, "dias_baja_previos": 60, "dias_baja_ultimo_anio": 20,
-         "lesiones_previas_mismo_tipo": 1, "partidos_temporada_anterior": 30}
-
-    Devuelve un diccionario con:
-        dias          -> dias estimados de recuperacion
-        rango         -> (minimo, maximo) donde cae el 50% de los casos parecidos
-        influyentes   -> lista de (variable, efecto en dias), de mayor a menor efecto
-        base          -> estimacion para un caso "tipico" (punto de comparacion)
-    """
+    """Devuelve dias, rango, influyentes y base para los datos del formulario."""
     dias = _predecir(datos)
     bajo, alto = INFO["factor_rango"]
 
-    # Variables influyentes: para cada variable se pregunta
-    # "¿cuanto cambiaria la estimacion si esta variable tuviera un valor tipico?"
-    # Si la diferencia es grande, esa variable pesa mucho en ESTE caso.
+    # Efecto de cada variable: diferencia contra su valor tipico
     efectos = []
     for variable in VARIABLES:
         tipico = INFO["valores_tipicos"][variable]
@@ -85,7 +59,6 @@ def estimar_recuperacion(datos):
         efectos.append((NOMBRES[variable], round(efecto, 1)))
     efectos.sort(key=lambda e: abs(e[1]), reverse=True)
 
-    # Valor base: lo que estimaria el modelo para un jugador y una lesion "tipicos"
     base = _predecir(INFO["valores_tipicos"])
 
     return {

@@ -1,15 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-servidor.py
------------
-Servidor web (Flask) de KineTrack AI.
-  - Muestra la pagina que esta en la carpeta  web/
-  - Recibe los datos del formulario y devuelve la estimacion del modelo
-
-Como correrlo:
-  py servidor.py
-y abrir en el navegador:  http://localhost:5000
-"""
+"""Servidor Flask de KineTrack AI. Correr con: py server.py"""
 
 from pathlib import Path
 
@@ -19,38 +9,39 @@ from prediccion import INFO, VARIABLES, estimar_recuperacion
 
 CARPETA_WEB = Path(__file__).resolve().parent / "public"
 app = Flask(__name__, static_folder=None)
-app.json.sort_keys = False  # mantener el orden original de los datos
+app.json.sort_keys = False
 
 
 @app.get("/")
 def inicio():
-    """Pagina principal."""
     if (CARPETA_WEB / "index.html").exists():
         return send_from_directory(CARPETA_WEB, "index.html")
-    return redirect("/index.html")  # en Vercel la pagina la sirve la carpeta public/
+    # En Vercel la carpeta public/ se sirve directamente
+    return redirect("/index.html")
+
+
+@app.get("/<path:archivo>")
+def estaticos(archivo):
+    return send_from_directory(CARPETA_WEB, archivo)
 
 
 @app.get("/api/info")
 def info():
-    """Informacion del modelo: opciones de los desplegables, metricas, distribucion, etc."""
     return jsonify(INFO)
 
 
 def validar(datos):
-    """RF-04: revisa que esten todos los campos y que los valores tengan sentido.
-    Devuelve una lista de errores (vacia si todo esta bien)."""
+    """RF-04: devuelve la lista de errores, vacia si todo esta bien."""
     errores = []
 
     faltan = [v for v in VARIABLES if datos.get(v) in (None, "")]
     if faltan:
         return [f"Falta el campo: {v}" for v in faltan]
 
-    # Las opciones de texto deben ser de las que conoce el modelo
     for v in INFO["variables_categoricas"]:
         if datos[v] not in INFO["opciones"][v]:
             errores.append(f"Valor no válido para {v}: {datos[v]}")
 
-    # Los numeros deben ser numeros y estar en rangos razonables
     limites = {
         "edad": (15, 45), "altura_cm": (150, 215), "mes_lesion": (1, 12),
         "lesiones_previas": (0, 60), "dias_baja_previos": (0, 4000),
@@ -69,7 +60,7 @@ def validar(datos):
     if errores:
         return errores
 
-    # Coherencia entre campos del historial
+    # Coherencia del historial
     if datos["lesiones_previas_mismo_tipo"] > datos["lesiones_previas"]:
         errores.append("Las lesiones del mismo tipo no pueden ser más que el total de lesiones previas.")
     if datos["dias_baja_ultimo_anio"] > datos["dias_baja_previos"]:
@@ -81,10 +72,9 @@ def validar(datos):
 
 @app.post("/api/estimar")
 def estimar():
-    """RF-05: recibe el formulario y devuelve la estimacion.
-    RNF-07: no se guarda nada; los datos solo se usan para calcular y se descartan."""
+    """RF-05: estimacion. RNF-07: no se guarda nada."""
     datos = request.get_json(silent=True) or {}
-    datos = {v: datos.get(v) for v in VARIABLES}  # solo las variables del modelo
+    datos = {v: datos.get(v) for v in VARIABLES}
     errores = validar(datos)
     if errores:
         return jsonify({"ok": False, "errores": errores}), 400
