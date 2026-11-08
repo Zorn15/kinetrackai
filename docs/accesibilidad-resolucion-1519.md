@@ -29,7 +29,7 @@ Este documento muestra cómo la interfaz de KineTrack AI cumple las **Directrice
 
 | Criterio | Estado | Cómo se cumple |
 |---|---|---|
-| **CC4.** Textos e imágenes ampliables y en tamaños adecuados | Cumple | El texto base es de 16 px, el equivalente en pantalla del «tamaño 12» que da de ejemplo la norma, y ningún texto visible baja de 12 px. Todos los tamaños de letra están en `rem`, así que respetan el zoom y la configuración del navegador. El **panel de accesibilidad** permite ampliar el texto del 87,5 % al **200 %**. Se verificó que a 200 % no se desborda nada ni hay desplazamiento horizontal en 390, 768 y 1280 px de ancho. |
+| **CC4.** Textos e imágenes ampliables y en tamaños adecuados | Cumple | El texto base es de 16 px, el equivalente en pantalla del «tamaño 12» que da de ejemplo la norma, y ningún texto visible baja de 12 px. Todos los tamaños de letra están en `rem`, así que respetan el zoom y la configuración del navegador. El **panel de accesibilidad** permite ampliar el texto del 75 % al **200 %**, de 25 en 25. Se verificó que a 200 % no se desborda nada ni hay desplazamiento horizontal en 390, 768 y 1280 px de ancho. |
 | **CC5.** Contraste de color suficiente | Cumple | Todos los textos cumplen el contraste WCAG AA (4,5:1), verificado con axe-core en modo día, modo noche, inglés y súper contraste. El modo **súper contraste** aumenta el contraste sin usar blanco puro sobre negro puro (#F2F2F2 sobre #121212, y #111111 sobre #FAFAFA), como recomienda la norma. |
 | **CC6.** Imágenes alternas al texto cuando sea posible | Cumple (opcional) | Las secciones, botones y pasos combinan texto con un ícono que representa lo mismo. La silueta anatómica ilustra la zona del cuerpo elegida. |
 | **CC7.** Identificación coherente | Cumple | Las acciones iguales usan el mismo texto e ícono en todas partes. Por ejemplo, «Formulario», «Resultado ML» y «Modelo & Info» se ven igual en el menú superior, en el inferior del celular y en el mapa del sitio. |
@@ -96,7 +96,7 @@ Este documento muestra cómo la interfaz de KineTrack AI cumple las **Directrice
 
 El botón **«Ajustes»** del encabezado, y el botón «Ajustes de accesibilidad» del pie de página, abren un panel con:
 
-1. **Tamaño del texto:** A− / A+, del 87,5 % al 200 % (CC4).
+1. **Tamaño del texto:** A− / A+, del 75 % al 200 %, de 25 en 25 (CC4).
 2. **Súper contraste:** colores de máximo contraste y bordes marcados (CC5).
 3. **Reducir animaciones:** detiene movimientos y transiciones (CC20).
 4. **Restablecer.**

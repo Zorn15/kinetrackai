@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Estimacion del tiempo de recuperacion. Prueba rapida: python prediccion.py"""
+"""Estimacion de los dias de baja por lesion. Prueba rapida: python prediccion.py"""
 
 import json
 from pathlib import Path
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     }
     resultado = estimar_recuperacion(ejemplo)
     print(f"Modelo: {INFO['modelo']}")
-    print(f"Recuperacion estimada: {resultado['dias']} dias "
+    print(f"Dias de baja estimados: {resultado['dias']} dias "
           f"(rango probable: {resultado['rango'][0]} a {resultado['rango'][1]} dias)")
     print("Variables que mas influyeron:")
     for nombre, efecto in resultado["influyentes"]:
