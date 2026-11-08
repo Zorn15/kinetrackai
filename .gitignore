@@ -3,3 +3,10 @@ __pycache__/
 .venv/
 .vercel/
 .claude/
+
+# Entrenamiento: datos y resultados locales
+entrenamiento/dataset 1/
+entrenamiento/dataset 2/
+entrenamiento/datos/
+entrenamiento/resultados/
+entrenamiento/modelo/

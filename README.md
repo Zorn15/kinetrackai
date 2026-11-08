@@ -10,6 +10,7 @@ Proyecto de grado – Ingeniería de Sistemas, Fundación Universitaria Los Libe
 - `prediccion.py`: carga el modelo y calcula la estimación.
 - `modelo/`: modelo entrenado (preprocesamiento + XGBoost en formato JSON) e información del modelo.
 - `public/`: página web (HTML, CSS, JS y fuentes).
+- `entrenamiento/`: scripts para reproducir el dataset, el entrenamiento y la verificación del modelo (ver `entrenamiento/README.md`).
 
 ## Correr en local
 
