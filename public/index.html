@@ -19,7 +19,7 @@
   </script>
   <meta name="theme-color" content="#f6f8fa" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#0e141c" media="(prefers-color-scheme: dark)">
-  <meta name="description" content="KineTrack AI estima el tiempo de recuperación de lesiones en futbolistas con machine learning." data-i18n-content="meta.descripcion">
+  <meta name="description" content="KineTrack AI estima los días de baja por lesión en futbolistas con machine learning." data-i18n-content="meta.descripcion">
   <title>Formulario – KineTrack AI</title>
   <link rel="icon" type="image/png" href="logo.png">
   <link rel="apple-touch-icon" href="logo.png">
@@ -118,8 +118,8 @@
 
     <div class="card card--hero">
       <h1 class="h-hero" id="t-formulario" tabindex="-1" data-i18n="form.titulo">Nueva Evaluación Lesional</h1>
-      <p class="texto-sec" data-i18n="form.subtitulo">Estimación del tiempo de retorno al juego (RTP) a partir de datos históricos de lesiones en el fútbol profesional.</p>
-      <p class="instrucciones" data-i18n="form.instrucciones">Completa las tres secciones y pulsa <b>Calcular Estimación ML</b>. Todos los campos traen un valor inicial; los marcados como <em>opcional</em> no cambian la estimación.</p>
+      <p class="texto-sec" data-i18n="form.subtitulo">Estimación de los días de baja o ausencia deportiva a partir de datos históricos de lesiones en el fútbol profesional.</p>
+      <p class="instrucciones" data-i18n="form.instrucciones">Completa las tres secciones y pulsa <b>Calcular Estimación ML</b>. Todos los datos son obligatorios, excepto los marcados como <em>opcional</em>, que no cambian la estimación.</p>
       <p class="aviso-privacidad"><span class="ms ms-sm" aria-hidden="true">lock</span><span data-i18n="form.privacidad">Los datos solo se usan para calcular la estimación y no se almacenan.</span></p>
       <div class="pasos">
         <a class="paso" href="#sec-jugador" data-paso="jugador"><span class="ms ms-sm" aria-hidden="true">person</span><span data-i18n="form.paso1">1. Jugador</span><i></i></a>
@@ -138,27 +138,27 @@
 
         <div class="grid-2">
           <label class="campo">
-            <span class="etiqueta" data-i18n="jug.nombre">Nombre <em>(opcional, no se guarda)</em></span>
-            <input type="text" id="nombre" class="input" placeholder="Ej: Juan o Jugador #12" data-i18n-ph="jug.nombre.ph" maxlength="40" autocomplete="off">
+            <span class="etiqueta" data-i18n="jug.nombre">Nombre <em>(no se guarda)</em></span>
+            <input type="text" id="nombre" class="input" placeholder="Ej: Juan" data-i18n-ph="jug.nombre.ph" maxlength="40" autocomplete="off" required>
           </label>
           <label class="campo">
-            <span class="etiqueta" data-i18n="jug.apellido">Apellido <em>(opcional)</em></span>
-            <input type="text" id="apellido" class="input" placeholder="Ej: Vanegas" data-i18n-ph="jug.apellido.ph" maxlength="40" autocomplete="off">
+            <span class="etiqueta" data-i18n="jug.apellido">Apellido <em>(no se guarda)</em></span>
+            <input type="text" id="apellido" class="input" placeholder="Ej: Vanegas" data-i18n-ph="jug.apellido.ph" maxlength="40" autocomplete="off" required>
           </label>
         </div>
 
         <div class="grid-2">
           <div class="campo">
             <span class="etiqueta"><span id="edad-lbl" data-i18n="jug.edad">Edad</span> <span class="etq-acento" data-i18n="jug.anios">años</span></span>
-            <div class="stepper" data-campo="edad" data-min="16" data-max="42" role="group" aria-labelledby="edad-lbl">
+            <div class="stepper" data-campo="edad" data-min="16" data-max="42" data-inicio="16" role="group" aria-labelledby="edad-lbl">
               <button type="button" class="stepper__btn" data-paso="-1" aria-label="Restar" data-i18n-aria="restar">−</button>
-              <output class="stepper__valor" id="edad">26</output>
+              <input type="text" inputmode="numeric" maxlength="2" class="stepper__valor" id="edad" placeholder="—" aria-labelledby="edad-lbl" autocomplete="off" required>
               <button type="button" class="stepper__btn" data-paso="1" aria-label="Sumar" data-i18n-aria="sumar">+</button>
             </div>
           </div>
           <div class="campo">
-            <span class="etiqueta"><span data-i18n="jug.estatura">Estatura</span> <span class="etq-acento" id="altura-txt">182 cm</span></span>
-            <input type="range" id="altura_cm" aria-label="Estatura en centímetros" data-i18n-aria="jug.estatura.aria" class="slider" min="155" max="205" value="182">
+            <span class="etiqueta"><span data-i18n="jug.estatura">Estatura</span> <span class="etq-acento" id="altura-txt">—</span></span>
+            <input type="range" id="altura_cm" aria-label="Estatura en centímetros" data-i18n-aria="jug.estatura.aria" class="slider" min="155" max="205" value="155">
             <div class="slider__marcas"><span>1.55 m</span><span>2.05 m</span></div>
           </div>
         </div>
@@ -172,7 +172,7 @@
           <div class="campo">
             <label class="etiqueta" for="pais" data-i18n="jug.pais">País del club <em>(opcional)</em></label>
             <div class="select-wrap">
-              <select id="pais" class="input"></select>
+              <select id="pais" class="input select-banderas"><button><selectedcontent></selectedcontent></button></select>
               <span class="ms" aria-hidden="true">public</span>
             </div>
           </div>
@@ -245,11 +245,11 @@
         <div class="campo">
           <label class="etiqueta" for="fecha" data-i18n="les.fecha">Fecha de la lesión</label>
           <div class="fecha">
-            <span class="ms fecha__icono" aria-hidden="true">calendar_month</span>
             <div class="fecha__txt">
-              <input type="date" id="fecha" class="input input--fecha" aria-describedby="fecha-hace">
+              <input type="date" id="fecha" class="input input--fecha" aria-describedby="fecha-hace" required>
               <span class="fecha__hace" id="fecha-hace">—</span>
             </div>
+            <button type="button" class="btn btn--sec fecha__btn"><span class="ms" aria-hidden="true">calendar_month</span><span data-i18n="les.fecha.elegir">Elegir fecha</span></button>
           </div>
         </div>
       </div>
@@ -267,7 +267,7 @@
           </div>
           <div class="stepper" data-campo="lesiones_previas" data-min="0" data-max="50" role="group" aria-labelledby="lp-lbl">
             <button type="button" class="stepper__btn" data-paso="-1" aria-label="Restar" data-i18n-aria="restar">−</button>
-            <output class="stepper__valor" id="lesiones_previas">0</output>
+            <input type="text" inputmode="numeric" maxlength="2" class="stepper__valor" id="lesiones_previas" placeholder="—" aria-labelledby="lp-lbl" autocomplete="off" required>
             <button type="button" class="stepper__btn" data-paso="1" aria-label="Sumar" data-i18n-aria="sumar">+</button>
           </div>
         </div>
@@ -279,26 +279,26 @@
           </div>
           <div class="stepper" data-campo="lesiones_previas_mismo_tipo" data-min="0" data-max="50" role="group" aria-labelledby="lmt-lbl">
             <button type="button" class="stepper__btn" data-paso="-1" aria-label="Restar" data-i18n-aria="restar">−</button>
-            <output class="stepper__valor" id="lesiones_previas_mismo_tipo">0</output>
+            <input type="text" inputmode="numeric" maxlength="2" class="stepper__valor" id="lesiones_previas_mismo_tipo" placeholder="—" aria-labelledby="lmt-lbl" autocomplete="off" required>
             <button type="button" class="stepper__btn" data-paso="1" aria-label="Sumar" data-i18n-aria="sumar">+</button>
           </div>
         </div>
 
         <div class="campo campo--slider">
-          <div class="slider-cab"><span data-i18n="his.acumulados">Días de baja acumulados</span><b class="num-ambar" id="dias_baja_previos-txt">0 días</b></div>
+          <div class="slider-cab"><span data-i18n="his.acumulados">Días de baja acumulados</span><b class="num-ambar" id="dias_baja_previos-txt">—</b></div>
           <input type="range" id="dias_baja_previos" aria-label="Días de baja acumulados" data-i18n-aria="his.acumulados" class="slider slider--ambar" min="0" max="600" value="0">
           <div class="slider__marcas"><span data-i18n="his.marca0">0 días</span><span>300</span><span data-i18n="his.marca600">600+ días</span></div>
         </div>
 
         <div class="campo campo--slider">
-          <div class="slider-cab"><span data-i18n="his.ultimo">Días de baja en los últimos 12 meses</span><b class="num-cyan" id="dias_baja_ultimo_anio-txt">0 días</b></div>
+          <div class="slider-cab"><span data-i18n="his.ultimo">Días de baja en los últimos 12 meses</span><b class="num-cyan" id="dias_baja_ultimo_anio-txt">—</b></div>
           <input type="range" id="dias_baja_ultimo_anio" aria-label="Días de baja en los últimos 12 meses" data-i18n-aria="his.ultimo" class="slider" min="0" max="365" value="0">
           <div class="slider__marcas"><span>0</span><span>180</span><span data-i18n="his.marca365">365 días</span></div>
         </div>
 
         <div class="campo campo--slider">
-          <div class="slider-cab"><span data-i18n="his.partidos">Partidos jugados la temporada anterior</span><b class="num-cyan" id="partidos_temporada_anterior-txt">25 partidos</b></div>
-          <input type="range" id="partidos_temporada_anterior" aria-label="Partidos jugados la temporada anterior" data-i18n-aria="his.partidos" class="slider" min="0" max="70" value="25">
+          <div class="slider-cab"><span data-i18n="his.partidos">Partidos jugados la temporada anterior</span><b class="num-cyan" id="partidos_temporada_anterior-txt">—</b></div>
+          <input type="range" id="partidos_temporada_anterior" aria-label="Partidos jugados la temporada anterior" data-i18n-aria="his.partidos" class="slider" min="0" max="70" value="0">
           <div class="slider__marcas"><span>0</span><span>35</span><span>70</span></div>
         </div>
       </div>
@@ -308,7 +308,7 @@
         <span class="ms" aria-hidden="true">task_alt</span>
         <div aria-live="polite">
           <strong data-i18n="int.titulo">Revisión de los datos</strong>
-          <span id="integridad-txt">Todos los campos validados.</span>
+          <span id="integridad-txt"></span>
           <ul id="integridad-errores"></ul>
         </div>
       </div>
@@ -344,7 +344,7 @@
     <div class="grid-res">
       <div class="card card--rtp">
         <div class="rtp__top">
-          <h2 class="chip chip--teal chip--titulo"><span class="ms ms-sm" aria-hidden="true">timer</span><span data-i18n="res.rtp">Retorno estimado al juego (RTP)</span></h2>
+          <h2 class="chip chip--teal chip--titulo"><span class="ms ms-sm" aria-hidden="true">timer</span><span data-i18n="res.rtp">Baja deportiva estimada</span></h2>
         </div>
 
         <div class="anillo">
@@ -359,11 +359,11 @@
           </svg>
           <div class="anillo__centro">
             <b id="r-dias">—</b>
-            <span data-i18n="res.dias">días estimados</span>
+            <span data-i18n="res.dias">días de baja</span>
           </div>
         </div>
 
-        <div class="alta"><span class="ms ms-sm" aria-hidden="true">event_available</span><span data-i18n="res.alta">Alta competitiva aprox.:</span> <b id="r-fecha-alta">—</b></div>
+        <div class="alta"><span class="ms ms-sm" aria-hidden="true">event_available</span><span data-i18n="res.alta">Fin aproximado de la baja:</span> <b id="r-fecha-alta">—</b></div>
 
         <div class="rango">
           <span><span data-i18n="res.rango">Rango probable:</span> <b id="r-rango">—</b></span>
@@ -374,9 +374,9 @@
           <div class="fases__cab"><span class="mini-cap" data-i18n="res.linea">Línea de tiempo estimada</span><span class="texto-cyan" data-i18n="res.segun">Según el modelo</span></div>
           <div class="fases__barra"><i class="f1"></i><i class="f2"></i><i class="f3"></i></div>
           <div class="fase" style="--i:0"><span class="fase__n">01</span><div><strong data-i18n="res.f1">Lesión registrada</strong><small id="t-lesion">—</small></div><span class="fase__dia" id="t-lesion-dia">Día 0</span></div>
-          <div class="fase" style="--i:1"><span class="fase__n">02</span><div><strong data-i18n="res.f2">Retorno más temprano probable</strong><small id="t-min">—</small></div><span class="fase__dia" id="t-min-dia">—</span></div>
-          <div class="fase fase--clave" style="--i:2"><span class="fase__n">03</span><div><strong data-i18n="res.f3">Retorno estimado</strong><small id="t-est">—</small></div><span class="fase__dia" id="t-est-dia">—</span></div>
-          <div class="fase fase--ambar" style="--i:3"><span class="fase__n">04</span><div><strong data-i18n="res.f4">Retorno más tardío probable</strong><small id="t-max">—</small></div><span class="fase__dia" id="t-max-dia">—</span></div>
+          <div class="fase" style="--i:1"><span class="fase__n">02</span><div><strong data-i18n="res.f2">Fin de la baja más temprano</strong><small id="t-min">—</small></div><span class="fase__dia" id="t-min-dia">—</span></div>
+          <div class="fase fase--clave" style="--i:2"><span class="fase__n">03</span><div><strong data-i18n="res.f3">Fin de la baja estimado</strong><small id="t-est">—</small></div><span class="fase__dia" id="t-est-dia">—</span></div>
+          <div class="fase fase--ambar" style="--i:3"><span class="fase__n">04</span><div><strong data-i18n="res.f4">Fin de la baja más tardío</strong><small id="t-max">—</small></div><span class="fase__dia" id="t-max-dia">—</span></div>
         </div>
       </div>
 
@@ -385,7 +385,7 @@
           <div class="card__head card__head--top">
             <div>
               <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">bar_chart</span><span data-i18n="res.explicabilidad">Explicabilidad</span></h2>
-              <span class="texto-sec" data-i18n="res.explicabilidad.sub">Variables que más influyeron en este pronóstico</span>
+              <span class="texto-sec" data-i18n="res.explicabilidad.sub">Variables asociadas a los mayores cambios en esta estimación (no son causas)</span>
             </div>
             <span class="valor-base"><span data-i18n="res.base">Valor base:</span><b id="r-base">—</b></span>
           </div>
@@ -400,7 +400,7 @@
           <span class="ms aviso__ic" aria-hidden="true">stethoscope</span>
           <div>
             <h3><span data-i18n="res.aviso">Aviso clínico importante</span> <span class="ms ms-sm" aria-hidden="true">warning</span></h3>
-            <p data-i18n="res.aviso.txt">Esta estimación es una herramienta de apoyo basada en datos históricos y no reemplaza el criterio, diagnóstico ni alta médica del médico o fisioterapeuta del club.</p>
+            <p data-i18n="res.aviso.txt">Esta estimación es un apoyo estadístico basado en los días de baja registrados históricamente. No indica la recuperación clínica completa ni autoriza el retorno a la competencia, no cuenta con validación clínica y no reemplaza el criterio, diagnóstico ni alta médica del médico o fisioterapeuta del club.</p>
           </div>
         </div>
 
@@ -494,6 +494,7 @@
           <span class="mini-cap" data-i18n="mod.global">Global</span>
         </div>
         <div id="i-importancia" class="importancia"></div>
+        <p class="texto-sec nota" data-i18n="mod.importancia.nota">Método: ganancia (<span lang="en">gain</span>) de XGBoost, sumando las columnas de cada variable. Indica cuánto usa el modelo cada variable para predecir, no que esa variable cause más o menos días de baja.</p>
       </div>
 
       <div class="card">
@@ -501,9 +502,21 @@
         <p class="texto-sec" data-i18n="mod.limitaciones.sub">Aspectos a tener en cuenta antes de usar la estimación en decisiones clínicas:</p>
         <ul class="limitaciones">
           <li class="lim"><span class="ms" aria-hidden="true">group</span><div data-i18n="mod.lim1"><b>1. Población de élite masculina</b><span>Solo aprendió de futbolistas profesionales hombres de las cinco grandes ligas europeas. En fútbol femenino, juvenil o amateur los tiempos pueden ser distintos.</span></div></li>
-          <li class="lim"><span class="ms" aria-hidden="true">help</span><div data-i18n="mod.lim2"><b>2. Sin grado ni tratamiento</b><span>Los datos no indican el grado de la lesión (I, II o III) ni el tratamiento aplicado, factores que cambian mucho la recuperación.</span></div></li>
+          <li class="lim"><span class="ms" aria-hidden="true">help</span><div data-i18n="mod.lim2"><b>2. Sin grado ni tratamiento</b><span>Los datos no indican el grado de la lesión (I, II o III) ni el tratamiento aplicado, factores que cambian mucho la duración de la baja.</span></div></li>
           <li class="lim"><span class="ms" aria-hidden="true">history_toggle_off</span><div data-i18n="mod.lim3"><b>3. Historial incompleto</b><span>Transfermarkt solo guarda las 15 lesiones más recientes de cada jugador, por lo que el historial previo puede quedar corto.</span></div></li>
           <li class="lim"><span class="ms" aria-hidden="true">trending_up</span><div data-i18n="mod.lim4"><b>4. Casos largos o poco comunes</b><span>Las lesiones muy largas o poco frecuentes tienen más error, porque hay menos ejemplos de ellas en los datos.</span></div></li>
+          <li class="lim"><span class="ms" aria-hidden="true">stethoscope</span><div data-i18n="mod.lim5"><b>5. Sin validación clínica</b><span>Se validó solo con datos históricos: es un apoyo estadístico y todavía no se ha probado en un entorno clínico.</span></div></li>
+        </ul>
+      </div>
+
+      <div class="card card--ancho">
+        <div class="card__head">
+          <h2 class="h-sec"><span class="ms icono-sec" aria-hidden="true">help</span><span data-i18n="mod.leer">Cómo interpretar la estimación</span></h2>
+        </div>
+        <ul class="limitaciones lectura">
+          <li class="lim"><span class="ms" aria-hidden="true">timer</span><div data-i18n="mod.leer1"><b>Qué se estima</b><span>Los días de baja o ausencia deportiva registrados en las fuentes de datos. No equivalen necesariamente a la recuperación clínica completa ni a la autorización para volver a competir.</span></div></li>
+          <li class="lim"><span class="ms" aria-hidden="true">compare_arrows</span><div><b data-i18n="mod.leer2">Cómo se calcula el rango</b><span id="i-rango">—</span></div></li>
+          <li class="lim"><span class="ms" aria-hidden="true">bar_chart</span><div data-i18n="mod.leer3"><b>Cómo se explica cada caso</b><span>Se cambia una variable a la vez por su valor típico y se mide cuánto varía la estimación. Son asociaciones predictivas, no relaciones causales: cambiar una variable en la realidad no garantiza ese cambio en los días de baja.</span></div></li>
         </ul>
       </div>
 
@@ -516,8 +529,8 @@
           <li><span>01</span><div data-i18n="mod.p1"><b>Ingreso de datos del jugador</b><small>Formulario: perfil, lesión e historial.</small></div></li>
           <li><span>02</span><div data-i18n="mod.p2"><b>Validación y preparación</b><small>Control de rangos, One-Hot Encoding y relleno de faltantes.</small></div></li>
           <li><span>03</span><div><b><span data-i18n="mod.p3.t">Modelo</span> <span class="js-modelo">XGBoost</span></b><small data-i18n="mod.p3">Predice los días sobre una escala logarítmica y los devuelve a días.</small></div></li>
-          <li><span>04</span><div data-i18n="mod.p4"><b>Explicación por variable</b><small>Compara el caso con un jugador "típico" para ver qué suma o resta días.</small></div></li>
-          <li class="pipeline__fin"><span>05</span><div data-i18n="mod.p5"><b>Rango probable</b><small>Intervalo donde cayó el 50% de los casos parecidos durante la validación.</small></div></li>
+          <li><span>04</span><div data-i18n="mod.p4"><b>Explicación por variable</b><small>Cambia una variable a la vez por su valor típico y mide cuánto varía la estimación.</small></div></li>
+          <li class="pipeline__fin"><span>05</span><div data-i18n="mod.p5"><b>Rango probable</b><small>Estimación multiplicada por los percentiles 25 y 75 del error en validación; cubre cerca del 50% de los casos.</small></div></li>
         </ol>
       </div>
     </div>

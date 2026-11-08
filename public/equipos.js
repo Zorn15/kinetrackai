@@ -85,3 +85,21 @@ const EQUIPOS_POR_PAIS = {
     "Nacional", "Peñarol", "Plaza Colonia", "Progreso", "Racing (Montevideo)", "River Plate (Uruguay)",
   ],
 };
+
+// Banderas simplificadas por pais (viewBox 30 x 20). Son decorativas.
+const BANDERAS = {
+  "Colombia": '<path fill="#fcd116" d="M0 0h30v10H0z"/><path fill="#003893" d="M0 10h30v5H0z"/><path fill="#ce1126" d="M0 15h30v5H0z"/>',
+  "Alemania": '<path d="M0 0h30v7H0z"/><path fill="#d00" d="M0 7h30v6H0z"/><path fill="#ffce00" d="M0 13h30v7H0z"/>',
+  "Argentina": '<path fill="#74acdf" d="M0 0h30v20H0z"/><path fill="#fff" d="M0 7h30v6H0z"/><circle cx="15" cy="10" r="2" fill="#f6b40e"/>',
+  "Brasil": '<path fill="#009b3a" d="M0 0h30v20H0z"/><path fill="#fedf00" d="M15 2l13 8-13 8L2 10z"/><circle cx="15" cy="10" r="4" fill="#002776"/>',
+  "Chile": '<path fill="#fff" d="M0 0h30v10H0z"/><path fill="#d52b1e" d="M0 10h30v10H0z"/><path fill="#0039a6" d="M0 0h10v10H0z"/><path fill="#fff" d="M5 2l.7 2h2.2L6.1 5.3l.7 2.1L5 6.1 3.2 7.4l.7-2.1L2.1 4h2.2z"/>',
+  "Ecuador": '<path fill="#fd0" d="M0 0h30v10H0z"/><path fill="#034ea2" d="M0 10h30v5H0z"/><path fill="#ed1c24" d="M0 15h30v5H0z"/><circle cx="15" cy="10" r="2.5" fill="#7a5c2e"/>',
+  "España": '<path fill="#aa151b" d="M0 0h30v20H0z"/><path fill="#f1bf00" d="M0 5h30v10H0z"/>',
+  "Francia": '<path fill="#fff" d="M0 0h30v20H0z"/><path fill="#0055a4" d="M0 0h10v20H0z"/><path fill="#ef4135" d="M20 0h10v20H20z"/>',
+  "Inglaterra": '<path fill="#fff" d="M0 0h30v20H0z"/><path fill="#ce1124" d="M13 0h4v20h-4zM0 8h30v4H0z"/>',
+  "Italia": '<path fill="#fff" d="M0 0h30v20H0z"/><path fill="#008c45" d="M0 0h10v20H0z"/><path fill="#cd212a" d="M20 0h10v20H20z"/>',
+  "México": '<path fill="#fff" d="M0 0h30v20H0z"/><path fill="#006847" d="M0 0h10v20H0z"/><path fill="#ce1126" d="M20 0h10v20H20z"/><circle cx="15" cy="10" r="2.5" fill="#8a5a2b"/>',
+  "Perú": '<path fill="#d91023" d="M0 0h30v20H0z"/><path fill="#fff" d="M10 0h10v20H10z"/>',
+  "Portugal": '<path fill="#f00" d="M0 0h30v20H0z"/><path fill="#060" d="M0 0h12v20H0z"/><circle cx="12" cy="10" r="3.5" fill="#fc0"/>',
+  "Uruguay": '<path fill="#fff" d="M0 0h30v20H0z"/><path fill="#0038a8" d="M0 2.2h30v2.2H0zM0 6.7h30v2.2H0zM0 11.1h30v2.2H0zM0 15.6h30v2.2H0z"/><path fill="#fff" d="M0 0h11.1v11.1H0z"/><circle cx="5.5" cy="5.5" r="3" fill="#fcd116"/>',
+};

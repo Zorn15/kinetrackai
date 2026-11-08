@@ -1,6 +1,6 @@
 # KineTrack AI
 
-Aplicación web que estima el tiempo de recuperación de lesiones en futbolistas usando machine learning (XGBoost).
+Aplicación web que estima los días de baja o ausencia deportiva por lesión en futbolistas usando machine learning (XGBoost). La variable estimada son los días de baja registrados, no la recuperación clínica completa ni la autorización para volver a competir.
 
 Proyecto de grado – Ingeniería de Sistemas, Fundación Universitaria Los Libertadores.
 
@@ -29,7 +29,7 @@ Luego abrir http://localhost:5000.
 - **Idioma español / inglés**: en Ajustes. Los textos están en `public/i18n.js` (el español se toma de `index.html`). Al modelo siempre se le envían los valores en español; solo cambia lo que se muestra.
 - **Posición en la cancha**: el jugador se ubica tocando su posición sobre una cancha; un marcador animado se desliza hasta ella.
 - **País y equipo**: primero se elige el país (ligas europeas del dataset, Latinoamérica y Portugal) y luego el club. Es solo informativo: el modelo no lo usa. La lista está en `public/equipos.js`.
-- **Accesibilidad** (en Ajustes): tamaño de letra del 87,5 % al 200 %, súper contraste (colores de máximo contraste y bordes marcados), reducir animaciones y restablecer. Se recuerda en el navegador; si el sistema pide más contraste o menos movimiento, se activa solo.
+- **Accesibilidad** (en Ajustes): tamaño de letra del 75 % al 200 %, de 25 en 25, súper contraste (colores de máximo contraste y bordes marcados), reducir animaciones y restablecer. Se recuerda en el navegador; si el sistema pide más contraste o menos movimiento, se activa solo.
 - **Responsive**: probado en 320 px (celulares pequeños), 390 px (celulares), 768 px (tablets) y 1366 px o más (escritorio). En celular la navegación va abajo; desde tablet pasa al encabezado.
 - **Accesibilidad (Resolución MinTIC 1519 de 2020)**: cumple los 29 criterios del Anexo 1 que aplican (los otros 3 son de video y audio, que la app no tiene), basados en WCAG 2.1 AA: texto base de 16 px ampliable al 200 %, contraste AA en todos los modos, mapa del sitio en el pie de página, títulos de pestaña por vista, manejo completo con teclado y errores claros. La matriz criterio por criterio está en [docs/accesibilidad-resolucion-1519.md](docs/accesibilidad-resolucion-1519.md).
 - **Animaciones**: transición entre vistas y cambio de tema con View Transitions, tarjetas que aparecen al hacer scroll y micro‑animaciones en las selecciones. Se desactivan si el sistema tiene activado "reducir movimiento".
@@ -38,4 +38,4 @@ Luego abrir http://localhost:5000.
 
 Se publica en Vercel importando este repositorio. Vercel detecta la app Flask en `server.py` y sirve la carpeta `public/`.
 
-> La estimación es una herramienta de apoyo y no reemplaza el criterio del profesional de la salud.
+> La estimación es un apoyo estadístico sin validación clínica y no reemplaza el criterio del profesional de la salud.

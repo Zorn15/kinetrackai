@@ -5,20 +5,20 @@ let ultimoResultado = null;
 
 // Valores del formulario
 const estado = {
-  edad: 26,
-  altura_cm: 182,
-  posicion: "Mediocentro",
+  edad: null,
+  altura_cm: null,
+  posicion: "",
   pais: "",
   equipo: "",
-  pie_habil: "Derecho",
-  tipo_lesion: "Lesión de isquiotibiales",
-  zona_cuerpo: "Muslo",
-  fecha: hoyISO(),
-  lesiones_previas: 0,
-  lesiones_previas_mismo_tipo: 0,
-  dias_baja_previos: 0,
-  dias_baja_ultimo_anio: 0,
-  partidos_temporada_anterior: 25,
+  pie_habil: "",
+  tipo_lesion: "",
+  zona_cuerpo: "",
+  fecha: "",
+  lesiones_previas: null,
+  lesiones_previas_mismo_tipo: null,
+  dias_baja_previos: null,
+  dias_baja_ultimo_anio: null,
+  partidos_temporada_anterior: null,
 };
 const ESTADO_INICIAL = { ...estado };
 
@@ -67,8 +67,20 @@ const NOMBRE_VARIABLE = {
 };
 
 // Errores por seccion del formulario
+const ERRORES_JUGADOR = ["err.nombre", "err.apellido", "err.edad", "err.altura", "err.posicion", "err.pie"];
 const ERRORES_LESION = ["err.tipo", "err.zona", "err.fecha", "err.futuro"];
-const ERRORES_HISTORIAL = ["err.recaidas", "err.ultimo", "err.sinprevias", "err.previas"];
+const ERRORES_HISTORIAL = ["err.lesiones", "err.mismo", "err.acumulados", "err.dias12", "err.partidos",
+  "err.recaidas", "err.ultimo", "err.sinprevias", "err.previas"];
+
+// Campo que se resalta con cada error
+const CAMPO_DEL_ERROR = {
+  "err.nombre": "#nombre", "err.apellido": "#apellido", "err.edad": "#edad", "err.altura": "#altura_cm",
+  "err.posicion": "#posiciones", "err.pie": "#pie_habil", "err.tipo": "#tipo_lesion", "err.zona": "#zona_cuerpo",
+  "err.fecha": "#fecha", "err.futuro": "#fecha", "err.lesiones": "#lesiones_previas", "err.mismo": "#lesiones_previas_mismo_tipo",
+  "err.acumulados": "#dias_baja_previos", "err.dias12": "#dias_baja_ultimo_anio", "err.partidos": "#partidos_temporada_anterior",
+  "err.recaidas": "#lesiones_previas_mismo_tipo", "err.ultimo": "#dias_baja_ultimo_anio",
+  "err.sinprevias": "#dias_baja_previos", "err.previas": "#dias_baja_previos",
+};
 
 // ---------- Utilidades ----------
 const $ = (sel, raiz = document) => raiz.querySelector(sel);
@@ -171,11 +183,15 @@ aplicarTema(metaTema.content === "light dark" ? null : metaTema.content);
 
 // ---------- Panel de accesibilidad ----------
 // CC4: el texto se puede ampliar hasta 200 %
-const ESCALAS = [0.875, 1, 1.125, 1.25, 1.5, 1.75, 2];
+const ESCALAS = [0.75, 1, 1.25, 1.5, 1.75, 2];
 const masContraste = matchMedia("(prefers-contrast: more)");
 
 function leerAccesibilidad() {
-  try { return JSON.parse(localStorage.getItem("kt-accesibilidad") || "{}"); } catch (e) { return {}; }
+  try {
+    const guardado = JSON.parse(localStorage.getItem("kt-accesibilidad") || "{}");
+    if (!ESCALAS.includes(guardado.escala)) delete guardado.escala; // valores de la escala anterior
+    return guardado;
+  } catch (e) { return {}; }
 }
 let acc = leerAccesibilidad();
 
@@ -240,9 +256,9 @@ function aplicarIdioma() {
   $(".btn__txt", $("#btn-calcular")).textContent = t("btn.calcular");
   traducirOpciones();
   pintarSeleccion();
-  validar();
+  const errores = validar();
   pintarInfo();
-  if (ultimoResultado) { pintarResultado(ultimoResultado); mostrarResultadoFinal(ultimoResultado); }
+  if (ultimoResultado && !errores.length) { pintarResultado(ultimoResultado); mostrarResultadoFinal(ultimoResultado); }
 }
 
 function elegirIdioma(idioma) {
@@ -356,14 +372,26 @@ function pintarCancha() {
     marca.style.setProperty("--x", pos.x + "%");
     marca.style.setProperty("--y", pos.y + "%");
   }
-  $("#pos-elegida").textContent = etiqueta(estado.posicion);
+  $("#pos-elegida").textContent = estado.posicion ? etiqueta(estado.posicion) : "—";
+}
+
+// Windows no dibuja emojis de banderas: van como SVG si el navegador admite select personalizable
+const CON_BANDERAS = CSS.supports("appearance", "base-select");
+
+function opcionPais(valor) {
+  const o = new Option("", valor);
+  if (CON_BANDERAS) {
+    const dibujo = BANDERAS[valor] ? `<svg viewBox="0 0 30 20">${BANDERAS[valor]}</svg>` : "";
+    o.innerHTML = `<span class="bandera" aria-hidden="true">${dibujo}</span><span class="pais__txt"></span>`;
+  }
+  return o;
 }
 
 function armarPaises() {
   const sel = $("#pais");
-  sel.appendChild(new Option("", ""));
-  Object.keys(EQUIPOS_POR_PAIS).forEach((p) => sel.appendChild(new Option(p, p)));
-  sel.appendChild(new Option("", "__otro"));
+  sel.appendChild(opcionPais(""));
+  Object.keys(EQUIPOS_POR_PAIS).forEach((p) => sel.appendChild(opcionPais(p)));
+  sel.appendChild(opcionPais("__otro"));
   sel.addEventListener("change", () => {
     estado.pais = sel.value;
     estado.equipo = "";
@@ -386,7 +414,7 @@ function armarEquipos() {
 
 function traducirEquipos() {
   $$("#pais option").forEach((o) => {
-    o.textContent = o.value === "" ? t("pais.sin") : o.value === "__otro" ? t("pais.otro") : etiqueta(o.value);
+    ($(".pais__txt", o) ?? o).textContent = o.value === "" ? t("pais.sin") : o.value === "__otro" ? t("pais.otro") : etiqueta(o.value);
   });
   $$("#equipo option").forEach((o) => {
     o.textContent = o.value === "" ? (estado.pais ? t("equipo.sin") : t("equipo.elige"))
@@ -400,7 +428,7 @@ function armarPie() {
     const b = crear("button", "", `<span class="lbl"></span>`);
     b.type = "button";
     b.dataset.valor = p;
-    b.addEventListener("click", () => { estado.pie_habil = p; pintarSeleccion(); });
+    b.addEventListener("click", () => { estado.pie_habil = p; pintarSeleccion(); validar(); });
     cont.appendChild(b);
   });
 }
@@ -475,10 +503,21 @@ function traducirOpciones() {
 $$(".stepper").forEach((st) => {
   const campo = st.dataset.campo;
   const min = Number(st.dataset.min), max = Number(st.dataset.max);
+  const inicio = st.dataset.inicio === undefined ? null : Number(st.dataset.inicio);
+  const entrada = st.querySelector(".stepper__valor");
+  entrada.addEventListener("input", () => {
+    entrada.value = entrada.value.replace(/\D/g, "");
+    estado[campo] = entrada.value === "" ? null : Number(entrada.value);
+    pintarSeleccion();
+    validar();
+  });
   st.querySelectorAll(".stepper__btn").forEach((b) => {
     b.addEventListener("click", () => {
       const antes = estado[campo];
-      estado[campo] = Math.min(max, Math.max(min, estado[campo] + Number(b.dataset.paso)));
+      const paso = Number(b.dataset.paso);
+      // Vacio: la edad arranca en su valor inicial; los conteos, en 1 con + y en 0 con -
+      const arranque = inicio ?? Math.max(min, min + paso);
+      estado[campo] = antes === null ? arranque : Math.min(max, Math.max(min, antes + paso));
       pintarSeleccion();
       validar();
       if (estado[campo] !== antes && !sinMovimiento()) {
@@ -497,13 +536,27 @@ const SLIDERS = {
   dias_baja_ultimo_anio: (v) => t("u.dias", { n: v }),
   partidos_temporada_anterior: (v) => t("u.partidos", { n: v }),
 };
+const TECLAS_SLIDER = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End", "PageUp", "PageDown"];
 Object.keys(SLIDERS).forEach((id) => {
-  $("#" + id).addEventListener("input", (e) => { estado[id] = Number(e.target.value); pintarSeleccion(); validar(); });
+  const fijar = (e) => { estado[id] = Number(e.target.value); pintarSeleccion(); validar(); };
+  const s = $("#" + id);
+  s.addEventListener("input", fijar);
+  // Tocarlo sin moverlo tambien cuenta: asi se puede elegir el minimo
+  s.addEventListener("click", fijar);
+  s.addEventListener("keyup", (e) => { if (TECLAS_SLIDER.includes(e.key)) fijar(e); });
 });
+
+// Nombre y apellido
+["#nombre", "#apellido"].forEach((id) => $(id).addEventListener("input", () => { if (INFO) validar(); }));
 
 // Fecha
 $("#fecha").max = hoyISO();
 $("#fecha").addEventListener("change", (e) => { estado.fecha = e.target.value; pintarSeleccion(); validar(); });
+// Tocar cualquier parte del recuadro abre el calendario
+if ("showPicker" in HTMLInputElement.prototype) {
+  $(".fecha").classList.add("con-calendario");
+  $(".fecha").addEventListener("click", () => { try { $("#fecha").showPicker(); } catch (e) {} });
+}
 
 // ---------- Pintar la seleccion ----------
 function marcar(selector, valor) {
@@ -526,27 +579,34 @@ function pintarSeleccion() {
   $("#equipo").value = estado.equipo;
   $("#tipo_lesion").value = estado.tipo_lesion;
 
-  ["edad", "lesiones_previas", "lesiones_previas_mismo_tipo"].forEach((c) => ($("#" + c).textContent = estado[c]));
+  ["edad", "lesiones_previas", "lesiones_previas_mismo_tipo"].forEach((c) => {
+    const valor = String(estado[c] ?? "");
+    if ($("#" + c).value !== valor) $("#" + c).value = valor;
+  });
 
   Object.entries(SLIDERS).forEach(([id, txt]) => {
     const s = $("#" + id);
-    s.value = estado[id];
+    const vacio = estado[id] === null;
+    s.value = vacio ? s.min : estado[id];
+    s.classList.toggle("is-vacio", vacio);
+    if (vacio) s.setAttribute("aria-valuetext", t("sin.definir")); else s.removeAttribute("aria-valuetext");
     s.style.setProperty("--p", ((s.value - s.min) / (s.max - s.min)) * 100 + "%");
-    $("#" + (id === "altura_cm" ? "altura-txt" : id + "-txt")).textContent = txt(estado[id]);
+    $("#" + (id === "altura_cm" ? "altura-txt" : id + "-txt")).textContent = vacio ? "—" : txt(estado[id]);
   });
 
   const tipo = estado.tipo_lesion;
-  $("#diag-nombre").textContent = etiqueta(tipo);
+  $("#diag-nombre").textContent = tipo ? etiqueta(tipo) : t("diag.sin");
   const mediana = (INFO.mediana_dias_por_tipo || {})[tipo];
-  $("#diag-mediana").textContent = mediana !== undefined ? t("diag.mediana", { d: mediana }) : "—";
+  $("#diag-mediana").hidden = mediana === undefined;
+  $("#diag-mediana").textContent = mediana !== undefined ? t("diag.mediana", { d: mediana }) : "";
   const grupo = Object.entries(INFO.grupos_tipo || {}).find(([, ts]) => ts.includes(tipo));
   $("#diag-grupo").textContent = grupo ? t("diag.grupo", { g: etiqueta(grupo[0]) }) : "";
 
   const xy = ZONAS_SVG[estado.zona_cuerpo];
   const punto = $("#zona-punto");
-  punto.style.opacity = xy ? 1 : 0;
+  punto.style.visibility = xy ? "visible" : "hidden"; // la animacion del punto controla su opacidad
   if (xy) { punto.setAttribute("cx", xy[0]); punto.setAttribute("cy", xy[1]); }
-  $("#zona-tag").textContent = estado.zona_cuerpo === "No especificada" ? t("zona.sin") : etiqueta(estado.zona_cuerpo);
+  $("#zona-tag").textContent = !estado.zona_cuerpo ? "—" : estado.zona_cuerpo === "No especificada" ? t("zona.sin") : etiqueta(estado.zona_cuerpo);
 
   $("#fecha").value = estado.fecha;
   const dias = Math.round((fechaDesdeISO(hoyISO()) - fechaDesdeISO(estado.fecha || hoyISO())) / 86400000);
@@ -555,28 +615,65 @@ function pintarSeleccion() {
 }
 
 // ---------- RF-04 Validacion ----------
+// Lo que falta solo se lista despues del primer intento de calcular
+let intentoEnvio = false;
+
+function tieneNombre(texto) { return (texto.match(/\p{L}/gu) || []).length >= 2; }
+function stepperValido(campo) {
+  const st = $(`.stepper[data-campo="${campo}"]`);
+  return estado[campo] !== null && estado[campo] >= Number(st.dataset.min) && estado[campo] <= Number(st.dataset.max);
+}
+
 function validar() {
-  const errores = [];
-  if (!INFO.opciones.posicion.includes(estado.posicion)) errores.push("err.posicion");
-  if (!INFO.opciones.tipo_lesion.includes(estado.tipo_lesion)) errores.push("err.tipo");
-  if (!INFO.opciones.zona_cuerpo.includes(estado.zona_cuerpo)) errores.push("err.zona");
-  if (!estado.fecha) errores.push("err.fecha");
-  else if (estado.fecha > hoyISO()) errores.push("err.futuro");
-  if (estado.lesiones_previas_mismo_tipo > estado.lesiones_previas) errores.push("err.recaidas");
-  if (estado.dias_baja_ultimo_anio > estado.dias_baja_previos) errores.push("err.ultimo");
-  if (estado.lesiones_previas === 0 && estado.dias_baja_previos > 0) errores.push("err.sinprevias");
-  if (estado.lesiones_previas > 0 && estado.dias_baja_previos === 0) errores.push("err.previas");
+  const falta = [];
+  if (!tieneNombre($("#nombre").value)) falta.push("err.nombre");
+  if (!tieneNombre($("#apellido").value)) falta.push("err.apellido");
+  if (!stepperValido("edad")) falta.push("err.edad");
+  if (estado.altura_cm === null) falta.push("err.altura");
+  if (!INFO.opciones.posicion.includes(estado.posicion)) falta.push("err.posicion");
+  if (!INFO.opciones.pie_habil.includes(estado.pie_habil)) falta.push("err.pie");
+  if (!INFO.opciones.tipo_lesion.includes(estado.tipo_lesion)) falta.push("err.tipo");
+  if (!INFO.opciones.zona_cuerpo.includes(estado.zona_cuerpo)) falta.push("err.zona");
+  if (!estado.fecha) falta.push("err.fecha");
+  if (!stepperValido("lesiones_previas")) falta.push("err.lesiones");
+  if (!stepperValido("lesiones_previas_mismo_tipo")) falta.push("err.mismo");
+  if (estado.dias_baja_previos === null) falta.push("err.acumulados");
+  if (estado.dias_baja_ultimo_anio === null) falta.push("err.dias12");
+  if (estado.partidos_temporada_anterior === null) falta.push("err.partidos");
+
+  // Coherencia: solo entre datos ya escritos
+  const incoherente = [];
+  const lp = estado.lesiones_previas, lmt = estado.lesiones_previas_mismo_tipo;
+  const acum = estado.dias_baja_previos, ultimo = estado.dias_baja_ultimo_anio;
+  if (estado.fecha > hoyISO()) incoherente.push("err.futuro");
+  if (lp !== null && lmt !== null && lmt > lp) incoherente.push("err.recaidas");
+  if (acum !== null && ultimo !== null && ultimo > acum) incoherente.push("err.ultimo");
+  if (lp === 0 && acum !== null && acum > 0) incoherente.push("err.sinprevias");
+  if (lp !== null && lp > 0 && acum === 0) incoherente.push("err.previas");
+
+  const errores = [...falta, ...incoherente];
+  const visibles = intentoEnvio ? errores : incoherente;
 
   const caja = $("#integridad");
-  caja.classList.toggle("is-error", errores.length > 0);
-  caja.querySelector(".ms").textContent = errores.length ? "error" : "task_alt";
+  caja.classList.toggle("is-error", visibles.length > 0);
+  caja.querySelector(".ms").textContent = visibles.length ? "error" : errores.length ? "assignment" : "task_alt";
   // Solo se reescribe si cambia, para no repetirlo en lectores de pantalla
-  const resumen = errores.length ? t("int.errores", { n: errores.length, s: plural(errores.length) }) : t("int.ok");
-  const lista = errores.map((e) => `<li>${t(e)}</li>`).join("");
+  const resumen = !errores.length ? t("int.ok")
+    : visibles.length ? t("int.errores", { n: visibles.length, s: plural(visibles.length) })
+    : t("int.faltan", { n: errores.length, s: plural(errores.length) });
+  const lista = visibles.map((e) => `<li>${t(e)}</li>`).join("");
   if ($("#integridad-txt").textContent !== resumen) $("#integridad-txt").textContent = resumen;
   if ($("#integridad-errores").innerHTML !== lista) $("#integridad-errores").innerHTML = lista;
 
-  $('[data-paso="jugador"]').classList.toggle("is-ok", !errores.includes("err.posicion"));
+  $$("#formulario .is-falta").forEach((el) => el.classList.remove("is-falta"));
+  $$('#formulario [aria-invalid]').forEach((el) => el.removeAttribute("aria-invalid"));
+  visibles.forEach((e) => {
+    const campo = $(CAMPO_DEL_ERROR[e]);
+    campo.closest(".campo, .fila-stepper").classList.add("is-falta");
+    if (campo.matches("input:not([type=range])")) campo.setAttribute("aria-invalid", "true");
+  });
+
+  $('[data-paso="jugador"]').classList.toggle("is-ok", !errores.some((e) => ERRORES_JUGADOR.includes(e)));
   $('[data-paso="lesion"]').classList.toggle("is-ok", !errores.some((e) => ERRORES_LESION.includes(e)));
   $('[data-paso="historial"]').classList.toggle("is-ok", !errores.some((e) => ERRORES_HISTORIAL.includes(e)));
   return errores;
@@ -585,12 +682,14 @@ function validar() {
 // ---------- RF-05 Envio del formulario ----------
 $("#formulario").addEventListener("submit", async (e) => {
   e.preventDefault();
+  intentoEnvio = true;
   const errores = validar();
   if (errores.length) {
     $("#integridad").scrollIntoView({ behavior: sinMovimiento() ? "auto" : "smooth", block: "center" });
     mostrarToast(t(errores[0]));
     return;
   }
+  ocultarToast();
 
   const datos = {
     posicion: estado.posicion, pie_habil: estado.pie_habil,
@@ -630,8 +729,12 @@ $("#formulario").addEventListener("submit", async (e) => {
 
 // RF-09 Limpiar y nueva consulta
 function limpiar() {
-  Object.assign(estado, ESTADO_INICIAL, { fecha: hoyISO() });
+  Object.assign(estado, ESTADO_INICIAL);
   zonaSugerida = null;
+  intentoEnvio = false;
+  ultimoResultado = null;
+  $("#informe").innerHTML = "";
+  $$('[data-vista="resultado"]').forEach((b) => (b.disabled = true));
   $("#nombre").value = "";
   $("#apellido").value = "";
   armarEquipos();
@@ -892,6 +995,7 @@ function pintarInfo() {
     m: INFO.modelo, n: num(INFO.n_lesiones_entrenamiento), j: num(INFO.n_jugadores_entrenamiento),
     t: tempTxt ? t("i.temporadas", { t: tempTxt }) : "",
   });
+  $("#i-rango").textContent = t("i.rango", { b: num(INFO.factor_rango[0], 2), a: num(INFO.factor_rango[1], 2) });
   $("#i-mae").textContent = num(m.MAE, 1);
   $("#i-medae").textContent = num(m.MedAE, 1);
   $("#i-r2").textContent = num(m.R2, 2);
@@ -941,11 +1045,6 @@ async function iniciar() {
     mostrarToast(t("toast.modelo"));
     return;
   }
-  // Si una opcion por defecto no existe en el modelo, se usa la primera
-  ["posicion", "pie_habil", "tipo_lesion", "zona_cuerpo"].forEach((c) => {
-    if (!INFO.opciones[c].includes(estado[c])) estado[c] = ESTADO_INICIAL[c] = INFO.opciones[c][0];
-  });
-
   armarPosiciones();
   armarPaises();
   armarEquipos();
